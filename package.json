@@ -1,0 +1,27 @@
+{
+  "name": "rndr-stats-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "faunadb": "^4.4.1"
+  },
+  "devDependencies": {
+    "netlify-cli": "^8.0.3"
+  },
+  "scripts": {
+    "dev": "netlify dev",
+    "debug": "netlify dev --inspect",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tehfonsi/rndr-stats-web.git"
+  },
+  "author": "Stephan Schober",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tehfonsi/rndr-stats-web/issues"
+  },
+  "homepage": "https://github.com/tehfonsi/rndr-stats-web#readme"
+}
