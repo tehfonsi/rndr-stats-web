@@ -5,21 +5,25 @@
 ## operators
 
 id: hashed eth address
+
 eth_address: from registry
+created: date
 
 ## gpus
 
 id: random
 name: eg RTX 3090
 
-## nodes
+## nodes 
+id: random
 
-id: node id from registry
-date_added: date
+node_id: node id from registry
+added: date
 password: password set by user
 operator: ref to operator
 jobs_completed: from registry
 previews_sent: from registry
+thumbnails_sent: from registry
 score: from registry
 gpus: list with ref to gpus
 

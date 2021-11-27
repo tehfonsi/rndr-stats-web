@@ -1,0 +1,12 @@
+# create operator
+PUT http://localhost:8888/api/node HTTP/1.1
+content-type: application/json
+
+{
+"eth_address": "0xf675F37AA8Db2d0424EB173BF5F10a33FCB27270",
+"node_id": "7afc8f2072db2435bbed81c9eb84bec0436eaae68ae0e5cfac240502178925d514a0d636059926aefdbe3914c03c7174",
+"score": "81",
+"previews_sent": "21994",
+"jobs_completet": "5617",
+"thumbnails_sent": "27387"
+}

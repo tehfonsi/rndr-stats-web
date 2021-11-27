@@ -17,6 +17,11 @@ exports.handler = async (event, _context) => {
       eth_address
     };
 
+    const newOperator = {
+      eth_address,
+      created: q.Now()
+    };
+
     let result;
     try {
        result = await serverClient.query(
@@ -27,12 +32,16 @@ exports.handler = async (event, _context) => {
         q.If(
           q.Exists(q.Var('match')),
           q.Update(q.Select('ref', q.Get(q.Var('match'))), q.Var('data')),
-          q.Create(q.Ref(q.Collection('operators'), id),{ data: operator })
+          q.Create(q.Ref(q.Collection('operators'), id),{ data: newOperator })
         )
       )
       );
     } catch (err) {
       console.error(err);
+      return {
+        statusCode: 200,
+        body: JSON.stringify(err)
+      };
     }
     
     return {
