@@ -1,0 +1,8 @@
+# create operator
+POST http://localhost:8888/api/state HTTP/1.1
+content-type: application/json
+
+{
+"node_id": "7afc8f2072db2435bbed81c9eb84bec0436eaae68ae0e5cfac240502178925d514a0d636059926aefdbe3914c03c7174",
+"type": "Idle"
+}

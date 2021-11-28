@@ -30,7 +30,15 @@ gpus: list with ref to gpus
 ## states
 
 id: random
-date
-node: ref to node
-state: 'idle' | 'start_render' | 'rendering' | 'finish_render' | 'mining' | 'not_responding'
-score: from registry
+node_id: ref to node
+type: 'Startup' | 'Idle' | 'Rendering' | 'Mining'
+start: date
+
+## jobs
+
+id: random
+node_id: ref to node
+start: date
+end: date
+time: time in seconds
+result: 'Success' | 'Cancel' | 'Fail'
