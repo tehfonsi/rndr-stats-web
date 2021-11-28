@@ -21,6 +21,7 @@ const newNode = async (event) => {
     return {statusCode: 400, body: "No operator found"};
   }
 
+  //TODO optimize reference (no prior read necessary)
   const node = {
     node_id,
     score: parseInt(score),
