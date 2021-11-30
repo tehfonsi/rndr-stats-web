@@ -11,8 +11,9 @@ exports.handler = async (event, _context) => {
       eth_address
     };
 
+    let result;
     try {
-      await Database.setOperator(operator)
+      result = await Database.setOperator(operator)
     } catch (error) {
       console.error(error);
       return {
@@ -22,7 +23,8 @@ exports.handler = async (event, _context) => {
     }
     
     return {
-      statusCode: 200
+      statusCode: 200,
+      body: JSON.stringify(result.insertId)
     };
   }
   return { statusCode: 405, body: "Method Not Allowed" };

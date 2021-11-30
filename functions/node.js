@@ -2,7 +2,7 @@ const hash = require('./utils/hash');
 const Database = require('../functions/utils/database');
 
 const newNode = async (event) => {
-  const {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus} = JSON.parse(event.body);
+  const {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = JSON.parse(event.body);
   const operator_id = hash(eth_address);
 
   const node = {
@@ -12,7 +12,8 @@ const newNode = async (event) => {
     jobs_completed: parseInt(jobs_completet),
     thumbnails_sent: parseInt(thumbnails_sent),
     gpus,
-    operator: operator_id
+    operator: operator_id,
+    password
   };
 
   try {
