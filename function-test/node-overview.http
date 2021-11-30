@@ -1,0 +1,2 @@
+# get node overview
+GET http://localhost:8888/api/node-overview?id=1459568903 HTTP/1.1

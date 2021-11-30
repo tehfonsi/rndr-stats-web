@@ -49,10 +49,22 @@ const addJob = async (job) => {
   await con.end();
 }
 
+const getNodeOverview = async (operator_id) => {
+  const con = await mysql.createConnection(CONNECTION_PARAMS);
+  const result = await con.query(`SELECT n.id, n.gpus, n.score, s.type as state, s.created as since
+  FROM states s
+    INNER JOIN nodes n ON s.node = n.id
+  WHERE s.id IN (SELECT MAX(id) FROM states GROUP BY node) 
+  AND s.node IN (SELECT id FROM nodes WHERE operator = ${operator_id})`);
+  await con.end();
+  return result;
+}
+
 module.exports = {
   setup,
   setOperator,
   setNode,
   addState,
-  addJob
+  addJob,
+  getNodeOverview
 }
