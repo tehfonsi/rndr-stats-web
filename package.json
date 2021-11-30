@@ -4,15 +4,17 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "faunadb": "^4.4.1"
+    "promise-mysql": "^5.0.4"
   },
   "devDependencies": {
     "netlify-cli": "^8.0.3"
   },
   "scripts": {
+    "bootstrap": "netlify dev:exec node ./scripts/setup.js",
     "dev": "netlify dev",
     "debug": "netlify dev --inspect",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "echo 'setup database' && npm run bootstrap",
     "build": ""
   },
   "repository": {

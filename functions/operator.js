@@ -1,12 +1,5 @@
-const faunadb = require('faunadb')
-const crypto = require('crypto');
 const hash = require('./utils/hash');
-const q = faunadb.query;
-
-const serverClient = new faunadb.Client({
-  secret: process.env.FAUNA_DB_SERVER_SECRET,
-  domain: 'db.eu.fauna.com'
-});
+const Database = require('../functions/utils/database');
 
 exports.handler = async (event, _context) => {
   if (event.httpMethod === "PUT") {
@@ -14,39 +7,22 @@ exports.handler = async (event, _context) => {
     const id = hash(eth_address);
 
     const operator = {
+      id,
       eth_address
     };
 
-    const newOperator = {
-      eth_address,
-      created: q.Now()
-    };
-
-    let result;
     try {
-       result = await serverClient.query(
-        q.Let({
-          match: q.Match(q.Index('eth_address'), eth_address),
-          data: { data: operator }
-        },
-        q.If(
-          q.Exists(q.Var('match')),
-          q.Update(q.Select('ref', q.Get(q.Var('match'))), q.Var('data')),
-          q.Create(q.Ref(q.Collection('operators'), id),{ data: newOperator })
-        )
-      )
-      );
-    } catch (err) {
-      console.error(err);
+      await Database.setOperator(operator)
+    } catch (error) {
+      console.error(error);
       return {
-        statusCode: 200,
-        body: JSON.stringify(err)
+        statusCode: 500,
+        body: JSON.stringify(error)
       };
     }
     
     return {
-      statusCode: 200,
-      body: JSON.stringify(result)
+      statusCode: 200
     };
   }
   return { statusCode: 405, body: "Method Not Allowed" };

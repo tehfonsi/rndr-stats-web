@@ -1,67 +1,32 @@
-const faunadb = require('faunadb')
-const q = faunadb.query;
-
-const serverClient = new faunadb.Client({
-  secret: process.env.FAUNA_DB_SERVER_SECRET,
-  domain: 'db.eu.fauna.com'
-});
+const hash = require('./utils/hash');
+const Database = require('../functions/utils/database');
 
 const newNode = async (event) => {
   const {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus} = JSON.parse(event.body);
+  const operator_id = hash(eth_address);
 
-  let operator;
-  try {
-    operator = await serverClient.query(
-      q.Get(
-        q.Match(q.Index('eth_address'), eth_address)
-      )
-    );
-  } catch (err) {
-    console.error(err);
-    return {statusCode: 400, body: "No operator found"};
-  }
-
-  //TODO optimize reference (no prior read necessary)
   const node = {
-    node_id,
+    id: node_id,
     score: parseInt(score),
     previews_sent: parseInt(previews_sent),
-    jobs_completet: parseInt(jobs_completet),
+    jobs_completed: parseInt(jobs_completet),
     thumbnails_sent: parseInt(thumbnails_sent),
     gpus,
-    operator: q.Ref(q.Collection('operators'), operator.ref.value.id)
+    operator: operator_id
   };
 
-  const newNode = {
-    ...node,
-    added: q.Now()
-  };
-
-  let result;
   try {
-      result = await serverClient.query(
-      q.Let({
-        match: q.Match(q.Index('node_id'), node_id),
-        data: { data: node }
-      },
-      q.If(
-        q.Exists(q.Var('match')),
-        q.Update(q.Select('ref', q.Get(q.Var('match'))), q.Var('data')),
-        q.Create(q.Collection('nodes'),{ data: newNode })
-      )
-    )
-    );
-  } catch (err) {
-    console.error(err);
+    await Database.setNode(node)
+  } catch (error) {
+    console.error(error);
     return {
-      statusCode: 200,
-      body: JSON.stringify(err)
+      statusCode: 500,
+      body: JSON.stringify(error)
     };
   }
   
   return {
-    statusCode: 200,
-    body: JSON.stringify(result)
+    statusCode: 200
   };
 }
 

@@ -1,54 +1,30 @@
-const faunadb = require('faunadb')
-const q = faunadb.query;
-
-const serverClient = new faunadb.Client({
-  secret: process.env.FAUNA_DB_SERVER_SECRET,
-  domain: 'db.eu.fauna.com'
-});
+const Database = require('../functions/utils/database');
 
 const newJob = async (event) => {
   const {node_id, start, end, time, result} = JSON.parse(event.body);
 
-  let node;
-  try {
-    node = await serverClient.query(
-      q.Get(
-        q.Match(q.Index('node_id'), node_id)
-      )
-    );
-  } catch (err) {
-    console.error(err);
-    return {statusCode: 400, body: "No node found"};
-  }
-
-  //TODO optimize reference (no prior read necessary)
-  const state = {
-    start: q.Time(start),
-    end: q.Time(end),
+  const startTimestamp = Date.parse(start)/ 1000;
+  const endTimestamp = Date.parse(end) / 1000;
+  const job = {
+    start: startTimestamp,
+    end: endTimestamp,
     time: parseFloat(time),
     result,
-    node: q.Ref(q.Collection('nodes'), node.ref.value.id)
+    node: node_id
   };
 
-  let queryResult;
   try {
-    queryResult = await serverClient.query(
-        q.Create(
-          q.Collection('jobs'),
-          { data: state },
-        )
-      )
+    await Database.addJob(job)
   } catch (err) {
     console.error(err);
     return {
-      statusCode: 200,
+      statusCode: 500,
       body: JSON.stringify(err)
     };
   }
   
   return {
     statusCode: 200,
-    body: JSON.stringify(queryResult)
   };
 }
 

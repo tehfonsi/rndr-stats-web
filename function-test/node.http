@@ -8,5 +8,6 @@ content-type: application/json
 "score": "81",
 "previews_sent": "21994",
 "jobs_completet": "5617",
-"thumbnails_sent": "27387"
+"thumbnails_sent": "27387",
+"gpus": "NVIDIA GeForce GTX 1060 6GB"
 }
