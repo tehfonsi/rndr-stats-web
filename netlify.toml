@@ -2,6 +2,7 @@
 [build]
 command = "npm run build"
 functions = "functions"
+publish = "dist"
 
 # https://docs.netlify.com/routing/redirects/
 [[redirects]]
