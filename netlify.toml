@@ -4,11 +4,13 @@ command = "npm run build"
 functions = "functions"
 publish = "dist"
 
+# https://docs.netlify.com/routing/redirects/
 [[redirects]]
 from = '/api/*'
 to = '/.netlify/functions/:splat'
+force = true
 status = 200
 
-## https://github.com/netlify/cli/blob/main/docs/netlify-dev.md#project-detection
+# https://github.com/netlify/cli/blob/main/docs/netlify-dev.md#project-detection
 [dev]
 command = "npm run dev:nuxt"
