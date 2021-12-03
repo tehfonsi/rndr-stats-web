@@ -7,7 +7,7 @@ publish = "dist"
 # https://docs.netlify.com/routing/redirects/
 [[redirects]]
 from = '/api/*'
-to = '/.netlify/functions/:splat'
+to = 'https://rndr-stats.netlify.app/.netlify/functions/:splat'
 force = true
 status = 200
 
