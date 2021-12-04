@@ -10,7 +10,7 @@
     async asyncData() {},
     async mounted() {
       const { id } = this.$route.params;
-      const url = '/api/node-overview?id=' + id;
+      const url = '/a/node-overview?id=' + id;
       this.overview = await $fetch(url);
     },
   };
