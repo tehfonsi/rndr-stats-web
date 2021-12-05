@@ -1,3 +1,10 @@
+#nuxt
+# nuxt.js build output
+.nuxt
+
+# Nuxt generate
+dist
+
 # Logs
 logs
 *.log
@@ -105,3 +112,5 @@ dist
 
 # Local Netlify folder
 .netlify
+
+.output
