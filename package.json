@@ -8,8 +8,8 @@
     "promise-mysql": "^5.0.4",
     "cross-env": "^5.2.0",
     "nuxt": "^2.15.8",
-    "@nuxtjs/axios": "^5.3.6",
-    "@nuxtjs/pwa": "^2.6.0"
+    "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/pwa": "^3.3.5"
   },
   "devDependencies": {
     "netlify-cli": "^8.0.3",
@@ -24,7 +24,6 @@
     "bootstrap": "netlify dev:exec node ./scripts/setup.js",
     "dev": "netlify dev",
     "debug": "netlify dev --inspect",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "echo 'setup database' && npm run bootstrap",
     "build": "nuxt build",
     "dev:nuxt": "nuxt",
