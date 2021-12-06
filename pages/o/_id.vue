@@ -8,7 +8,6 @@
       const { id } = params;
       try {
         const nodes = await $axios.$get('/api/node-overview?id=' + id);
-        console.log(nodes);
         return { nodes };
       } catch (error) {
         console.error(error);

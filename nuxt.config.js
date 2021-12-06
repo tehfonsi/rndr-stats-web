@@ -1,5 +1,7 @@
 import pkg from './package'
 
+const DEVELOPMENT = process.env.NODE_ENV !== 'production'
+
 export default {
   mode: 'universal',
   target: 'static',
@@ -50,7 +52,7 @@ export default {
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#optionsaxios: {
-    baseURL: development ? 'http://localhost:8888' : 'https://rndr-stats.netlify.app'
+    baseURL: DEVELOPMENT ? 'http://localhost:8888' : 'https://rndr-stats.netlify.app'
   },
 
   /*
