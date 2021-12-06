@@ -49,7 +49,8 @@ export default {
   ** Axios module configuration
   */
   axios: {
-    // See https://github.com/nuxt-community/axios-module#options
+    // See https://github.com/nuxt-community/axios-module#optionsaxios: {
+    baseURL: development ? 'http://localhost:8888' : 'https://rndr-stats.netlify.app'
   },
 
   /*

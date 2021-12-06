@@ -4,12 +4,16 @@
 
 <script>
   export default {
-    async asyncData({ params }) {
+    async asyncData({ params, $axios }) {
       const { id } = params;
-      const nodes = await fetch(
-        'https://rndr-stats.netlify.app/api/node-overview?id=' + id
-      ).then((res) => res.json());
-      return { nodes };
+      try {
+        const nodes = await $axios.$get('/api/node-overview?id=' + id);
+        console.log(nodes);
+        return { nodes };
+      } catch (error) {
+        console.error(error);
+      }
+      return { nodes: null };
     },
   };
 </script>
