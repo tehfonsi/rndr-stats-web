@@ -1,9 +1,7 @@
 <template>
   <section class="container">
     <div>
-      <h1 class="highlight">
-        rndr-stats
-      </h1>
+      <h1 class="highlight">rndr-stats <sup>beta</sup></h1>
       <div class="w-60 text-left mt-5">
         <span>How to get started:</span>
         <ul>
