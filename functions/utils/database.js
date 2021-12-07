@@ -63,11 +63,25 @@ const getNodeOverview = async (operator_id) => {
   return result;
 }
 
+const getJobOverview = async (operator_id, start, end) => {
+  const con = await mysql.createConnection(CONNECTION_PARAMS);
+  const result = await con.query(`select n.id, n.gpus, n.score, count(*) as job_count, sum(j.time) as total, 
+    sum(j.time) / 60 / 60 / TIMESTAMPDIFF(HOUR, "${start}", "${end}") as utilization
+  from jobs j
+    inner join nodes n ON j.node = n.id
+  where start >= "${start}" AND end <= "${end}"
+  and n.operator = ${operator_id}
+  group by node`);
+  await con.end();
+  return result;
+}
+
 module.exports = {
   setup,
   setOperator,
   setNode,
   addState,
   addJob,
-  getNodeOverview
+  getNodeOverview,
+  getJobOverview
 }
