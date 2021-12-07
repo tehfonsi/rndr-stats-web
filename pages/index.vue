@@ -27,6 +27,12 @@
           ><i>Warning</i>: Your ETH address is sent and needed to identify your
           nodes</span
         >
+        <br />
+        <br />
+        <span
+          ><i>Disclaimer</i>: This is a non-official community project and is
+          not associated with OTOY.</span
+        >
       </div>
     </div>
   </section>
