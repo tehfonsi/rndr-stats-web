@@ -46,6 +46,7 @@
 */
   .container {
     margin: 0 auto;
+    padding: 0 3rem;
     min-height: 100vh;
     display: flex;
     justify-content: center;
