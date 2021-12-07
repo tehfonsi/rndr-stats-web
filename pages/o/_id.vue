@@ -41,7 +41,6 @@
   import { fromNow } from '../../src/utils';
 
   export default {
-    layout: 'operator',
     data: () => {
       return {
         nodes: null,
