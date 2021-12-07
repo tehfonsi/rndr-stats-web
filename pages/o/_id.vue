@@ -1,7 +1,10 @@
 <template>
   <div>
-    <h1>RNDR Dashboard <sup>beta</sup></h1>
-    <ul>
+    <h1 class="m-5">RNDR Dashboard <sup>beta</sup></h1>
+    <div class="m-5" v-if="!$route.params.id">
+      Add your operator id at the end of the current url to see your dashboard.
+    </div>
+    <ul v-else>
       <li v-for="node in nodes" :key="node.id" class="my-2">
         <span>Node: {{ node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
         <div>
@@ -70,9 +73,3 @@
     },
   };
 </script>
-
-<style scoped>
-  h1 {
-    margin: 1rem;
-  }
-</style>

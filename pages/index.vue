@@ -1,9 +1,35 @@
 <template>
   <section class="container">
     <div>
-      <h1 class="title">
+      <h1 class="highlight">
         rndr-stats
       </h1>
+      <div class="w-60 text-left mt-5">
+        <span>How to get started:</span>
+        <ul>
+          <li>
+            Download
+            <a href="https://github.com/tehfonsi/rndr-watchdog"
+              >RNDR watchdog</a
+            >
+          </li>
+          <li>
+            Configure RNDR watchdog
+          </li>
+          <li>
+            Start RNDR watchdog
+          </li>
+          <li>
+            Copy your operator id (keep it secret)
+          </li>
+          <li>Go to your <a href="/o/">RNDR dashboard</a></li>
+        </ul>
+        <br />
+        <span
+          ><i>Warning</i>: Your ETH address saved sent and needed to identify
+          your nodes</span
+        >
+      </div>
     </div>
   </section>
 </template>
@@ -12,6 +38,7 @@
   import Logo from '~/components/Logo.vue';
 
   export default {
+    layout: 'operator',
     components: {
       Logo,
     },
