@@ -10,6 +10,7 @@
             <a href="https://github.com/tehfonsi/rndr-watchdog" target="_blank"
               >RNDR watchdog</a
             >
+            (modified version)
           </li>
           <li>
             Configure RNDR watchdog
