@@ -7,7 +7,7 @@
         <ul>
           <li>
             Download
-            <a href="https://github.com/tehfonsi/rndr-watchdog"
+            <a href="https://github.com/tehfonsi/rndr-watchdog" target="_blank"
               >RNDR watchdog</a
             >
           </li>
