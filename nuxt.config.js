@@ -55,7 +55,7 @@ export default {
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#optionsaxios: {
-    baseURL: DEVELOPMENT ? 'http://localhost:8888' : 'https://rndr-stats.netlify.app'
+    baseURL: DEVELOPMENT ? 'http://localhost:8888' : 'http://rndr-stats.com'
   },
 
   /*
