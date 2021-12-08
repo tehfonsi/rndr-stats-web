@@ -7,7 +7,9 @@
     <ul v-else>
       <div v-if="nodes">
         Last 24 hours: {{ overview.income.toFixed(2) }} RNDR /
-        {{ (overview.utilization * 100).toFixed(2) }}%
+        {{
+          overview.utilization ? (overview.utilization * 100).toFixed(2) : 0
+        }}%
         {{
           overview.tier3_utilization && overview.tier2_utilization
             ? `(T3: ${(overview.tier3_utilization * 100).toFixed(2)}%, T2: ${(
@@ -70,6 +72,7 @@
         let tier3_count = 0;
         let tier2_count = 0;
         this.nodes.forEach((node) => {
+          if (!node.jobs?.income) return;
           overview.income += node.jobs.income || 0;
           if (node.score < 300) {
             overview.tier3_utilization += node.jobs.utilization;
