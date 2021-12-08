@@ -5,40 +5,28 @@
       Add your operator id at the end of the current url to see your dashboard.
     </div>
     <ul v-else>
+      <div v-if="nodes">
+        Last 24 hours: {{ overview.income.toFixed(2) }} RNDR /
+        {{ (overview.utilization * 100).toFixed(2) }}%
+        {{
+          overview.tier3_utilization && overview.tier2_utilization
+            ? `(T3: ${(overview.tier3_utilization * 100).toFixed(2)}%, T2: ${(
+                overview.tier2_utilization * 100
+              ).toFixed(2)}%)`
+            : ''
+        }}
+      </div>
       <li v-for="node in nodes" :key="node.id" class="my-2">
-        <span>Node: {{ node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
-        <div>
-          State: <span class="highlight px-2">{{ node.state }}</span
-          >, since {{ fromNow(node.since) }}
-        </div>
-        <div>Total</div>
-        <div class="ml-5">Jobs completed: {{ node.jobs_completed }}</div>
-        <div class="ml-5">Previews sent: {{ node.previews_sent }}</div>
-        <div class="ml-5">Thumbnails send: {{ node.thumbnails_sent }}</div>
-        <div v-if="node.jobs">
-          <div>Last 24 hours</div>
-          <div class="ml-5">Jobs: {{ node.jobs.job_count }}</div>
-          <div class="ml-5">
-            Utilization: {{ (node.jobs.utilization * 100).toFixed(2) }} %
-          </div>
-          <div class="ml-5">
-            Estimated income:
-            {{
-              (
-                (24 * node.jobs.utilization * node.score) /
-                (node.score > 300 ? 50 : 200)
-              ).toFixed(2)
-            }}
-            RNDR
-          </div>
-        </div>
+        <client-only placeholder="Loading...">
+          <Node v-if="node" :node="node" />
+        </client-only>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-  import { fromNow } from '../../src/utils';
+  import Node from '../../components/node.vue';
 
   export default {
     data: () => {
@@ -57,7 +45,13 @@
         const nodes = results[0];
         const jobs = results[1];
         nodes.forEach((node) => {
-          node.jobs = jobs.find((job) => job.id === node.id) || undefined;
+          const job = jobs.find((job) => job.id === node.id) || undefined;
+          if (job) {
+            job.income =
+              (24 * job.utilization * node.score) /
+              (node.score < 300 ? 200 : 50);
+          }
+          node.jobs = job;
         });
         return { nodes };
       } catch (error) {
@@ -65,10 +59,35 @@
       }
       return { nodes: null };
     },
-    methods: {
-      fromNow: (date) => {
-        return fromNow(new Date(date));
+
+    computed: {
+      overview: function() {
+        const overview = {
+          income: 0,
+          tier3_utilization: 0,
+          tier2_utilization: 0,
+        };
+        let tier3_count = 0;
+        let tier2_count = 0;
+        this.nodes.forEach((node) => {
+          overview.income += node.jobs.income || 0;
+          if (node.score < 300) {
+            overview.tier3_utilization += node.jobs.utilization;
+            tier3_count++;
+          } else {
+            overview.tier2_utilization += node.jobs.utilization;
+            tier2_count++;
+          }
+        });
+        overview.utilization =
+          (overview.tier3_utilization + overview.tier2_utilization) /
+          (tier3_count + tier2_count);
+        overview.tier3_utilization /= tier3_count;
+        overview.tier2_utilization /= tier2_count;
+        return overview;
       },
     },
+    methods: {},
+    components: { Node },
   };
 </script>
