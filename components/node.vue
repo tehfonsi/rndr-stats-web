@@ -10,15 +10,15 @@
       <div class="ml-5">Jobs completed: {{ node.jobs_completed }}</div>
       <div class="ml-5">Previews sent: {{ node.previews_sent }}</div>
       <div class="ml-5">Thumbnails send: {{ node.thumbnails_sent }}</div>
-      <div v-if="node.jobs">
+      <div v-if="jobs">
         <div>Last 24 hours</div>
-        <div class="ml-5">Jobs: {{ node.jobs.job_count }}</div>
+        <div class="ml-5">Jobs: {{ jobs.job_count }}</div>
         <div class="ml-5">
-          Utilization: {{ (node.jobs.utilization * 100).toFixed(2) }} %
+          Utilization: {{ (jobs.utilization * 100).toFixed(2) }} %
         </div>
         <div class="ml-5">
           Estimated income:
-          {{ node.jobs.income.toFixed(2) }}
+          {{ jobs.income.toFixed(2) }}
           RNDR
         </div>
       </div>
@@ -56,10 +56,10 @@
         window.localStorage.setItem(this.node.id, JSON.stringify(this.state));
       },
     },
-    watch: {
-      node: function() {},
-    },
     computed: {
+      jobs: function() {
+        return this.node.jobs;
+      },
       expanded: function() {
         return this.state.expanded;
       },

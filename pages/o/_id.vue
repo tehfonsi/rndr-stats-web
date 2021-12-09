@@ -6,21 +6,46 @@
     </div>
     <ul v-else>
       <div v-if="nodes">
-        Last 24 hours: {{ overview.income.toFixed(2) }} RNDR /
-        {{
-          overview.utilization ? (overview.utilization * 100).toFixed(2) : 0
-        }}%
-        {{
-          overview.tier3_utilization && overview.tier2_utilization
-            ? `(T3: ${(overview.tier3_utilization * 100).toFixed(2)}%, T2: ${(
-                overview.tier2_utilization * 100
-              ).toFixed(2)}%)`
-            : ''
-        }}
+        <div>
+          Last
+          <span
+            v-bind:class="{ 'font-bold': days === 1 }"
+            class="24hours cursor-pointer"
+            v-on:click="selectDays(1)"
+            >24 hours</span
+          >
+          /
+          <span
+            v-bind:class="{ 'font-bold': days === 7 }"
+            class="7days cursor-pointer"
+            v-on:click="selectDays(7)"
+            >7 days</span
+          >
+          /
+          <span
+            v-bind:class="{ 'font-bold': days === 28 }"
+            class="28days cursor-pointer"
+            v-on:click="selectDays(28)"
+            >28 days</span
+          >:
+        </div>
+        <div>
+          {{ overview.income.toFixed(2) }} RNDR /
+          {{
+            overview.utilization ? (overview.utilization * 100).toFixed(2) : 0
+          }}%
+          {{
+            overview.tier3_utilization && overview.tier2_utilization
+              ? `(T3: ${(overview.tier3_utilization * 100).toFixed(2)}%, T2: ${(
+                  overview.tier2_utilization * 100
+                ).toFixed(2)}%)`
+              : ''
+          }}
+        </div>
       </div>
       <li v-for="node in nodes" :key="node.id" class="my-2">
         <client-only placeholder="Loading...">
-          <Node v-if="node" :node="node" />
+          <Node :node="node" />
         </client-only>
       </li>
     </ul>
@@ -33,36 +58,50 @@
   export default {
     data: () => {
       return {
-        nodes: null,
-        jobs: null,
+        id: null,
+        nodeOverview: null,
+        jobOverview: null,
+        days: 1,
       };
     },
     async asyncData({ params, $axios }) {
       const { id } = params;
       try {
-        const results = await Promise.all([
-          $axios.$get('/api/node-overview?id=' + id),
-          $axios.$get('/api/job-overview?id=' + id),
-        ]);
-        const nodes = results[0];
-        const jobs = results[1];
-        nodes.forEach((node) => {
-          const job = jobs.find((job) => job.id === node.id) || undefined;
-          if (job) {
-            job.income =
-              (24 * job.utilization * node.score) /
-              (node.score < 300 ? 200 : 50);
-          }
-          node.jobs = job;
-        });
-        return { nodes };
+        const nodes = await $axios.$get('/api/node-overview?id=' + id);
+        return { id, nodeOverview: nodes };
       } catch (error) {
         console.error(error);
       }
-      return { nodes: null };
+      return { id, nodeOverview: null };
     },
-
+    mounted() {
+      const days = window.localStorage.getItem('days');
+      if (days) {
+        this.days = parseInt(days);
+      }
+      console.log(this.days);
+      this.getJobsOverview(this.days);
+    },
     computed: {
+      nodes: function() {
+        if (!this.nodeOverview) {
+          return [];
+        }
+        const nodes = JSON.parse(JSON.stringify(this.nodeOverview));
+        if (this.jobOverview) {
+          nodes.forEach((node) => {
+            const job =
+              this.jobOverview.find((job) => job.id === node.id) || undefined;
+            if (job) {
+              job.income =
+                (this.days * 24 * job.utilization * node.score) /
+                (node.score < 300 ? 200 : 50);
+            }
+            node.jobs = job;
+          });
+        }
+        return nodes;
+      },
       overview: function() {
         const overview = {
           income: 0,
@@ -90,7 +129,23 @@
         return overview;
       },
     },
-    methods: {},
+    methods: {
+      selectDays: function(days) {
+        this.getJobsOverview(days);
+      },
+      getJobsOverview: async function(days) {
+        const d = new Date();
+        d.setDate(d.getDate() - days);
+        const start = parseInt(d.getTime() / 1000);
+        const jobs = await this.$axios.$get(
+          `/api/job-overview?id=${this.id}&start=${start}`
+        );
+        this.days = days;
+        window.localStorage.setItem('days', this.days);
+        this.jobOverview = jobs;
+      },
+    },
+    watch: {},
     components: { Node },
   };
 </script>
