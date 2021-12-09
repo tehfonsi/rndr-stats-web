@@ -9,21 +9,21 @@
         <div>
           Last
           <span
-            v-bind:class="{ 'font-bold': days === 1 }"
+            v-bind:class="{ 'font-bold': selectedDays === 1 }"
             class="24hours cursor-pointer"
             v-on:click="selectDays(1)"
             >24 hours</span
           >
           /
           <span
-            v-bind:class="{ 'font-bold': days === 7 }"
+            v-bind:class="{ 'font-bold': selectedDays === 7 }"
             class="7days cursor-pointer"
             v-on:click="selectDays(7)"
             >7 days</span
           >
           /
           <span
-            v-bind:class="{ 'font-bold': days === 28 }"
+            v-bind:class="{ 'font-bold': selectedDays === 28 }"
             class="28days cursor-pointer"
             v-on:click="selectDays(28)"
             >28 days</span
@@ -60,8 +60,8 @@
       return {
         id: null,
         nodeOverview: null,
-        jobOverview: null,
-        days: 1,
+        jobOverview: {},
+        selectedDays: 1,
       };
     },
     async asyncData({ params, $axios }) {
@@ -77,30 +77,16 @@
     mounted() {
       const days = window.localStorage.getItem('days');
       if (days) {
-        this.days = parseInt(days);
+        this.selectedDays = parseInt(days);
       }
-      console.log(this.days);
-      this.getJobsOverview(this.days);
+      this.getJobOverview(this.selectedDays);
     },
     computed: {
       nodes: function() {
         if (!this.nodeOverview) {
           return [];
         }
-        const nodes = JSON.parse(JSON.stringify(this.nodeOverview));
-        if (this.jobOverview) {
-          nodes.forEach((node) => {
-            const job =
-              this.jobOverview.find((job) => job.id === node.id) || undefined;
-            if (job) {
-              job.income =
-                (this.days * 24 * job.utilization * node.score) /
-                (node.score < 300 ? 200 : 50);
-            }
-            node.jobs = job;
-          });
-        }
-        return nodes;
+        return this.nodeOverview;
       },
       overview: function() {
         const overview = {
@@ -131,21 +117,40 @@
     },
     methods: {
       selectDays: function(days) {
-        this.getJobsOverview(days);
+        this.getJobOverview(days);
       },
-      getJobsOverview: async function(days) {
-        const d = new Date();
-        d.setDate(d.getDate() - days);
-        const start = parseInt(d.getTime() / 1000);
-        const jobs = await this.$axios.$get(
-          `/api/job-overview?id=${this.id}&start=${start}`
-        );
-        this.days = days;
-        window.localStorage.setItem('days', this.days);
-        this.jobOverview = jobs;
+      getJobOverview: async function(days) {
+        if (!this.jobOverview[days]) {
+          const d = new Date();
+          d.setDate(d.getDate() - days);
+          const start = parseInt(d.getTime() / 1000);
+          const jobs = await this.$axios.$get(
+            `/api/job-overview?id=${this.id}&start=${start}`
+          );
+          this.jobOverview[days] = jobs;
+        }
+        window.localStorage.setItem('days', days);
+        this.addJobsToNodes(days);
+      },
+      addJobsToNodes: function(days) {
+        const nodes = this.nodeOverview;
+        if (this.jobOverview[days]) {
+          nodes.forEach((node) => {
+            const job =
+              this.jobOverview[days].find((job) => job.id === node.id) ||
+              undefined;
+            if (job) {
+              job.income =
+                (days * 24 * job.utilization * node.score) /
+                (node.score < 300 ? 200 : 50);
+            }
+            node.jobs = job;
+          });
+        }
+        this.nodeOverview = JSON.parse(JSON.stringify(nodes));
+        this.selectedDays = days;
       },
     },
-    watch: {},
     components: { Node },
   };
 </script>
