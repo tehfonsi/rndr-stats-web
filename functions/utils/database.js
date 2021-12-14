@@ -76,6 +76,34 @@ const getJobOverview = async (operator_id, start, end) => {
   return result;
 }
 
+const getUtilizationOverview = async (start, end) => {
+  const con = await mysql.createConnection(CONNECTION_PARAMS);
+  const result = await con.query(`select score_range, summary.utilization, summary.total as time, summary.job_count
+    from (select case when u.score >= 0 and u.score <= 99 then '0 - 99'
+                when u.score >= 100 and u.score <= 199 then '100 - 199'
+                when u.score >= 200 and u.score <= 299 then '200 - 299'
+                when u.score >= 300 and u.score <= 999 then '300 - 999'
+                when u.score >= 1000 and u.score <= 1999 then '1000 - 1999'
+                when u.score >= 2000 and u.score <= 3999 then '2000 - 3999'
+                else '4000 - 10000'
+            end as score_range,
+            u.utilization as utilization,
+            u.total as total,
+            u.job_count as job_count
+        from
+            (select n.score, count(*) as job_count, sum(j.time) as total, 
+          sum(j.time) / 60 / 60 / TIMESTAMPDIFF(HOUR, "${start}", "${end}") as utilization
+        from jobs j
+          inner join nodes n ON j.node = n.id
+        where start >= "${start}" AND end <= "${end}"
+        group by node) as u
+    ) as summary
+    group by score_range
+    `);
+  await con.end();
+  return result;
+}
+
 module.exports = {
   setup,
   setOperator,
@@ -83,5 +111,6 @@ module.exports = {
   addState,
   addJob,
   getNodeOverview,
-  getJobOverview
+  getJobOverview,
+  getUtilizationOverview
 }

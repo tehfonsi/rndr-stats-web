@@ -1,7 +1,9 @@
 const Database = require('./utils/database');
 
-const getOverview = async (event) => {
-  let {id, start, end} = event.queryStringParameters;
+const utilization = new Set();
+
+const getUtilizationOverview = async (event) => {
+  let {start, end} = event.queryStringParameters;
 
   if (!start) {
     var d = new Date();
@@ -17,26 +19,22 @@ const getOverview = async (event) => {
     end = new Date(parseInt(end * 1000)).toISOString();
   }
 
-  if (!id) {
-    return {statusCode: 400, body: 'id parameter is missing'};
-  }
-
   let result;
   try {
-    result = await Database.getJobOverview(parseInt(id), start, end)
+    result = await Database.getUtilizationOverview(start, end)
   } catch (error) {
     console.error(error);
     return {statusCode: 500, body: JSON.stringify(error)};
   }
   
   return {statusCode: 200, 
-    headers: {'Cache-Control': 'public, s-maxage=600'},
+    headers: {'Cache-Control': 'public, s-maxage=3600'},
     body: JSON.stringify(result, null, 2)};
 }
 
 exports.handler = async (event, _context) => {
   if (event.httpMethod === "GET") {
-    return getOverview(event);
+    return getUtilizationOverview(event);
   }
   return { statusCode: 405, body: "Method Not Allowed" };
 }

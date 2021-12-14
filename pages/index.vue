@@ -35,12 +35,66 @@
           not associated with OTOY.</span
         >
       </div>
+      <div class="w-full h-64 text-left mt-5">
+        <div>
+          Network utilization for the past 7 days
+        </div>
+        <div class="mt-1">
+          <span class="inline-block w-32 font-bold">Range</span>
+          <span class="inline-block w-16 font-bold">Tier</span>
+          <span class="font-bold">Utilization</span>
+        </div>
+        <div v-for="range in utilization" :key="range.from">
+          <span class="inline-block w-32">{{range.from + ' - '+  range.to}}</span>
+          <span class="inline-block w-16">{{range.tier}}</span>
+          <span>{{range.utilization}} %</span>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script>
-  export default {};
+  export default {
+    data: () => {
+      return {
+        utilization: null
+      };
+    },
+    mounted() {
+      this.getUtilization();
+    },
+    methods: {
+      getUtilization: async function() {
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() - 1);
+        endDate.setUTCHours(23,59,59,999);
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 7);
+        startDate.setUTCHours(0,0,0,0);
+        const start = parseInt(startDate.getTime() / 1000);
+        const end = parseInt(endDate.getTime() / 1000);
+        const result = await this.$axios.$get(
+          `/api/utilization?start=${start}&end=${end}`
+        );
+        const data = result.map((u) => {
+          const object = {};
+          const range = u.score_range.split('-').map((value) => parseInt(value.trim()));
+          object.from = range[0];
+          object.to = range[1];
+          object.utilization = (u.utilization * 100).toFixed(2);
+          if (object.from >= 300) {
+            object.tier = 2;
+          } else {
+            object.tier = 3;
+          }
+          return object;
+        });
+        data.sort((e1, e2) => e1.from - e2.from);
+        this.utilization = data;
+      },
+    },
+  }
 </script>
 
 <style>
