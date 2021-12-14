@@ -29,8 +29,7 @@ const getOverview = async (event) => {
     return {statusCode: 500, body: JSON.stringify(error)};
   }
   
-  return {statusCode: 200, 
-    headers: {'Cache-Control': 'public, s-maxage=600'},
+  return {statusCode: 200,
     body: JSON.stringify(result, null, 2)};
 }
 
