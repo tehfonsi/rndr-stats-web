@@ -85,7 +85,7 @@ const getUtilizationOverview = async (start, end) => {
                 when u.score >= 300 and u.score <= 999 then '300 - 999'
                 when u.score >= 1000 and u.score <= 1999 then '1000 - 1999'
                 when u.score >= 2000 and u.score <= 3999 then '2000 - 3999'
-                else '4000 - 10000'
+                else '4000 - 9999'
             end as score_range,
             u.utilization as utilization,
             u.total as total,

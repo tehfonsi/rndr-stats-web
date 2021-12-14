@@ -40,7 +40,7 @@
           Network utilization for the past 7 days
         </div>
         <div class="mt-1">
-          <span class="inline-block w-32 font-bold">Range</span>
+          <span class="inline-block w-32 font-bold">OB Range</span>
           <span class="inline-block w-16 font-bold">Tier</span>
           <span class="font-bold">Utilization</span>
         </div>
