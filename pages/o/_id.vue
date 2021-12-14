@@ -1,8 +1,7 @@
 <template>
   <div>
     <h1 class="m-5">RNDR Dashboard <sup>beta</sup></h1>
-    <div class="m-5">Under maintenance...</div>
-    <!-- <div class="m-5" v-if="!$route.params.id">
+    <div class="m-5" v-if="!$route.params.id">
       Add your operator id at the end of the current url to see your dashboard.
     </div>
     <ul v-else>
@@ -49,7 +48,7 @@
           <Node :node="node" />
         </client-only>
       </li>
-    </ul> -->
+    </ul>
   </div>
 </template>
 

@@ -1,4 +1,3 @@
-const hash = require('./utils/hash');
 const Database = require('./utils/database');
 
 const getOverview = async (event) => {

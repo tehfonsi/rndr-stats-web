@@ -1,7 +1,5 @@
 const Database = require('./utils/database');
 
-const utilization = new Set();
-
 const getUtilizationOverview = async (event) => {
   let {start, end} = event.queryStringParameters;
 
