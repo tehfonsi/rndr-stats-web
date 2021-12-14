@@ -35,7 +35,7 @@
           not associated with OTOY.</span
         >
       </div>
-      <div class="w-full h-64 text-left mt-5">
+      <div class="w-full h-64 text-left mt-5" v-if="utilization">
         <div>
           Network utilization for the past 7 days
         </div>
@@ -62,7 +62,7 @@
       };
     },
     mounted() {
-      this.getUtilization();
+      // this.getUtilization();
     },
     methods: {
       getUtilization: async function() {
