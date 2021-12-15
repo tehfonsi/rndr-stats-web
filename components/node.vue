@@ -11,7 +11,7 @@
       <div class="ml-5">Previews sent: {{ node.previews_sent }}</div>
       <div class="ml-5">Thumbnails send: {{ node.thumbnails_sent }}</div>
       <div v-if="jobs">
-        <div>Last 24 hours</div>
+        <div>Selected timeframe</div>
         <div class="ml-5">Jobs: {{ jobs.job_count }}</div>
         <div class="ml-5">
           Utilization: {{ (jobs.utilization * 100).toFixed(2) }} %

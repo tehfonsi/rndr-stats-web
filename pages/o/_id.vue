@@ -142,7 +142,7 @@
             if (job) {
               job.income =
                 (days * 24 * job.utilization * node.score) /
-                (node.score < 300 ? 200 : 50);
+                (node.score < 300 ? 200 : 100);
             }
             node.jobs = job;
           });
