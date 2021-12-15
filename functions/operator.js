@@ -24,7 +24,7 @@ exports.handler = async (event, _context) => {
     
     return {
       statusCode: 200,
-      body: JSON.stringify(result.insertId)
+      body: JSON.stringify(id)
     };
   }
   return { statusCode: 405, body: "Method Not Allowed" };
