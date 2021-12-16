@@ -80,6 +80,13 @@
         this.selectedDays = parseInt(days);
       }
       this.getJobOverview(this.selectedDays);
+      // update job stats when tab/page becomes visible again
+      document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === 'visible') {
+        this.jobOverview = {};
+        this.getJobOverview(this.selectedDays);
+      }
+    });
     },
     computed: {
       nodes: function() {
