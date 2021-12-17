@@ -33,8 +33,18 @@ const setOperator = async (operator) => {
 const setNode = async (node) => {
   const con = await mysql.createConnection(CONNECTION_PARAMS);
   const password = (!node.password || node.password === '') ? `NULL` : `'${sha256(node.password)}'`;
-  await con.query(`REPLACE into nodes (id, operator, jobs_completed, previews_sent, thumbnails_sent, score, gpus, password) 
-                  values('${node.id}', ${node.operator}, ${node.jobs_completed}, ${node.previews_sent}, ${node.thumbnails_sent}, ${node.score}, '${node.gpus}', ${password})`);
+  await con.query(`insert into nodes (id, operator, jobs_completed, previews_sent, thumbnails_sent, score, gpus, password) 
+                  values('${node.id}', ${node.operator}, ${node.jobs_completed}, ${node.previews_sent}, ${node.thumbnails_sent}, ${node.score}, '${node.gpus}', ${password})
+                  on duplicate key update 
+                  operator=${node.operator},
+                  jobs_completed=${node.jobs_completed},
+                  previews_sent=${node.previews_sent}, 
+                  thumbnails_sent=${node.thumbnails_sent}, 
+                  score=${node.score},
+                  gpus='${node.gpus}',
+                  password=${password},
+                  updated=CURRENT_TIMESTAMP()
+                  `);
   await con.end();
 }
 
