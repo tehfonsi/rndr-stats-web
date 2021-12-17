@@ -39,16 +39,20 @@
         <div>
           Network utilization for the past 7 days
         </div>
-        <div class="mt-1">
-          <span class="inline-block w-32 font-bold">OB Range</span>
-          <span class="inline-block w-16 font-bold">Tier</span>
-          <span class="font-bold">Utilization</span>
-        </div>
-        <div v-for="range in utilization" :key="range.from">
-          <span class="inline-block w-32">{{range.from + ' - '+  range.to}}</span>
-          <span class="inline-block w-16">{{range.tier}}</span>
-          <span>{{range.utilization}} %</span>
-        </div>
+        <table class="w-full mt-1">
+          <tr>
+            <th>OB Range</th>
+            <th>Tier</th>
+            <th>Utilization</th>
+            <th>Nodes</th>
+          </tr>
+          <tr v-for="range in utilization" :key="range.from">
+            <td>{{range.from + ' - '+  range.to}}</td>
+            <td>{{range.tier}}</td>
+            <td>{{range.utilization}} %</td>
+            <td>{{range.nodes}}</td>
+          </tr>
+        </table>
       </div>
     </div>
   </section>
@@ -62,7 +66,7 @@
       };
     },
     mounted() {
-      // this.getUtilization();
+      this.getUtilization();
     },
     methods: {
       getUtilization: async function() {
@@ -78,20 +82,13 @@
           `/api/utilization?start=${start}&end=${end}`
         );
         const data = result.map((u) => {
-          const object = {};
-          const range = u.score_range.split('-').map((value) => parseInt(value.trim()));
-          object.from = range[0];
-          object.to = range[1];
-          object.utilization = (u.utilization * 100).toFixed(2);
-          if (object.from >= 300) {
-            object.tier = 2;
-          } else {
-            object.tier = 3;
-          }
-          return object;
+          u.range = u.from + ' - ' + u.to;
+          u.nodes = u.nodes > 10 ? '10+' : ''+u.nodes; 
+          u.utilization = (u.utilization * 100).toFixed(2);
+          return u;
         });
-        data.sort((e1, e2) => e1.from - e2.from);
-        this.utilization = data;
+        data.sort((e1, e2) => e1.from - e2.from)
+        this.utilization = data.filter((d) => d.utilization > 0);
       },
     },
   }
