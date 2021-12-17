@@ -37,7 +37,7 @@
       </div>
       <div class="w-full h-64 text-left mt-5" v-if="utilization">
         <div>
-          Network utilization for the past 7 days
+          Average network utilization for the past 7 days
         </div>
         <table class="w-full mt-1">
           <tr>
@@ -83,7 +83,17 @@
         );
         const data = result.map((u) => {
           u.range = u.from + ' - ' + u.to;
-          u.nodes = u.nodes > 10 ? '10+' : ''+u.nodes; 
+          if (u.nodes > 80) {
+            u.nodes = '80+';
+          } else if (u.nodes > 40) {
+            u.nodes = '40+';
+          } else if (u.nodes > 20) {
+            u.nodes = '20+';
+          } else if (u.nodes > 10) {
+            u.nodes = '10+';
+          } else {
+            u.nodes = ''+u.nodes;
+          }
           u.utilization = (u.utilization * 100).toFixed(2);
           return u;
         });
