@@ -2,7 +2,7 @@ const hash = require('./utils/hash');
 const Database = require('../functions/utils/database');
 
 const newNode = async (event) => {
-  const {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = JSON.parse(event.body);
+  let {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = JSON.parse(event.body);
   const operator_id = hash(eth_address);
 
   score = !!score ? parseInt(score) : 0;
