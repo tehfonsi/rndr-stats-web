@@ -82,11 +82,11 @@
       this.getJobOverview(this.selectedDays);
 
       // update job stats when tab/page becomes visible again
-      const onVisibilityChanged = () => {
+      const onVisibilityChanged = async () => {
         if (document.visibilityState === 'visible') {
-          this.getNodeOverview();
+          await this.getNodeOverview();
           this.jobOverview = {};
-          this.getJobOverview(this.selectedDays);
+          await this.getJobOverview(this.selectedDays);
         }
       };
       document.addEventListener("visibilitychange", onVisibilityChanged.bind(this));
