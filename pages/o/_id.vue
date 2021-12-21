@@ -80,13 +80,16 @@
         this.selectedDays = parseInt(days);
       }
       this.getJobOverview(this.selectedDays);
+
       // update job stats when tab/page becomes visible again
-      document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === 'visible') {
-        this.jobOverview = {};
-        this.getJobOverview(this.selectedDays);
-      }
-    });
+      const onVisibilityChanged = () => {
+        if (document.visibilityState === 'visible') {
+          this.getNodeOverview();
+          this.jobOverview = {};
+          this.getJobOverview(this.selectedDays);
+        }
+      };
+      document.addEventListener("visibilitychange", onVisibilityChanged.bind(this));
     },
     computed: {
       nodes: function() {
@@ -125,6 +128,9 @@
     methods: {
       selectDays: function(days) {
         this.getJobOverview(days);
+      },
+      getNodeOverview: async function() {
+        this.nodeOverview = await this.$axios.$get('/api/node-overview?id=' + this.id);
       },
       getJobOverview: async function(days) {
         if (!this.jobOverview[days]) {
