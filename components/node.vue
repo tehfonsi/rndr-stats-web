@@ -1,6 +1,6 @@
 <template>
   <div v-on:click="toggle" v-if="node">
-    <span>Node: {{ node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
+    <span>Node: {{ node.name || node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
     <div>
       State: <span class="highlight px-2">{{ node.state }}</span
       >, since {{ fromNow(node.since) }}
