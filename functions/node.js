@@ -1,5 +1,6 @@
 const hash = require('./utils/hash');
 const Database = require('../functions/utils/database');
+const sha256 = require('js-sha256').sha256;
 
 const newNode = async (event) => {
   let {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = JSON.parse(event.body);
@@ -9,6 +10,9 @@ const newNode = async (event) => {
   previews_sent = !!previews_sent ? parseInt(previews_sent) : 0;
   jobs_completet = !!jobs_completet ? parseInt(jobs_completet) : 0;
   thumbnails_sent = !!thumbnails_sent ? parseInt(thumbnails_sent) : 0;
+  if (password) {
+    password = sha256(password);
+  }
 
   const node = {
     id: node_id,

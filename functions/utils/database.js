@@ -64,7 +64,7 @@ const addJob = async (job) => {
 
 const getNodeOverview = async (operator_id) => {
   const con = await mysql.createConnection(CONNECTION_PARAMS);
-  const result = await con.query(`SELECT n.id, n.gpus, n.score, n.jobs_completed, n.previews_sent, n.thumbnails_sent, s.type as state, s.created as since
+  const result = await con.query(`SELECT n.id, n.name, n.gpus, n.score, n.jobs_completed, n.previews_sent, n.thumbnails_sent, s.type as state, s.created as since
   FROM states s
     INNER JOIN nodes n ON s.node = n.id
   WHERE s.id IN (SELECT MAX(id) FROM states GROUP BY node) 
@@ -94,6 +94,23 @@ const getJobOverview = async (operator_id, start, end) => {
   where start >= "${start}" AND end <= "${end}"
   and n.operator = ${operator_id}
   group by node`);
+  await con.end();
+  return result;
+}
+
+const getPasswords = async (node_id) => {
+  const con = await mysql.createConnection(CONNECTION_PARAMS);
+  const result = await con.query(`select password from nodes
+    where operator = (select operator from nodes where id = '${node_id}')`);
+  await con.end();
+  return result;
+}
+
+const updateName = async (node_id, name) => {
+  const con = await mysql.createConnection(CONNECTION_PARAMS);
+  const result = await con.query(`update nodes
+    set name = '${name}'
+    where id = '${node_id}'`);
   await con.end();
   return result;
 }
@@ -135,5 +152,7 @@ module.exports = {
   getNodeOverview,
   getJobOverview,
   getUtilizationOverview,
-  getUtilizationForAllNodes
+  getUtilizationForAllNodes,
+  getPasswords,
+  updateName
 }
