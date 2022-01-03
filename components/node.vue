@@ -1,11 +1,16 @@
 <template>
-  <div v-on:click="toggle" v-if="node">
-    <span>Node: {{ node.name || node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
-    <div>
+  <div v-if="node">
+    <div v-if="edit">
+      <input :value="node.name || ''"/>
+      <span v-on:click="hideInput" class="cursor-pointer">Cancel</span>
+      <span v-on:click="changeName" class="cursor-pointer">Change</span>
+    </div>
+    <span v-else v-on:click="showInput">Node: {{ node.name || node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
+    <div v-on:click="toggle" >
       State: <span class="highlight px-2">{{ node.state }}</span
       >, since {{ fromNow(node.since) }}
     </div>
-    <div v-if="expanded">
+    <div v-if="expanded" v-on:click="toggle" >
       <div>Total</div>
       <div class="ml-5">Jobs completed: {{ node.jobs_completed }}</div>
       <div class="ml-5">Previews sent: {{ node.previews_sent }}</div>
@@ -36,6 +41,7 @@
     data: () => {
       return {
         state: { expanded: true },
+        edit: false,
       };
     },
     mounted() {
@@ -54,6 +60,35 @@
       },
       saveState: function() {
         window.localStorage.setItem(this.node.id, JSON.stringify(this.state));
+      },
+      showInput: function() {
+        this.edit = true;
+        this.$nextTick(() => {
+          const input = this.$el.querySelector('input');
+          input.focus();
+        });
+      },
+      hideInput: function() {
+        this.edit = false;
+      },
+      changeName: async function() {
+        const password = prompt('Enter your password', '');
+        const input = this.$el.querySelector('input');
+        const name = input.value;
+        this.hideInput();
+        const result = await this.$axios.$post('/api/node-name', {
+          node_id: this.node.id,
+          name,
+          password,
+        })
+        .catch((error) => {
+          if (error.response.status === 403) {
+            alert('Wrong password');
+          }
+        });
+        if (result !== undefined) {
+          this.node.name = name;
+        }
       },
     },
     computed: {
