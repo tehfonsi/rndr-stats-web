@@ -20,7 +20,8 @@ const changeName = async (event) => {
   const correctPassword = savedPasswords.map((p) => p !== null && p === password).reduce((p, c) => p && c);
 
   if (!correctPassword) {
-    console.warn('wrong password');
+    await new Promise(r => setTimeout(r, 1000));
+    console.warn('Wrong password');
     return {
       statusCode: 403,
       body: 'Password does not match'
