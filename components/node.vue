@@ -83,7 +83,7 @@
         })
         .catch((error) => {
           if (error.response.status === 403) {
-            alert('Wrong password');
+            alert('Wrong password! Make sure you set the same password in the .ini file of all nodes.');
           }
         });
         if (result !== undefined) {
