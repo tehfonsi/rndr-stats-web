@@ -49,6 +49,9 @@
         </client-only>
       </li>
     </ul>
+    <div class="m-5">
+      Questions? You might find answers in the <a href="/faq">FAQ</a>.
+    </div>
   </div>
 </template>
 
