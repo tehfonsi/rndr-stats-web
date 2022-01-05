@@ -2,10 +2,10 @@
   <div v-if="node">
     <div v-if="edit">
       <input :value="node.name || ''"/>
-      <span v-on:click="hideInput" class="cursor-pointer">Cancel</span>
-      <span v-on:click="changeName" class="cursor-pointer">Change</span>
+      <span v-on:click="hideInput" class="cursor-pointer primary">Cancel</span>
+      <span v-on:click="changeName" class="cursor-pointer primary">Change</span>
     </div>
-    <span v-else v-on:click="showInput">Node: {{ node.name || node.gpus.split(',')[0] }} / {{ node.score }} OB</span>
+    <span v-else v-on:click="showInput">Node: <span  class="primary">{{ node.name || node.gpus.split(',')[0] }}</span> / {{ node.score }} OB</span>
     <div v-on:click="toggle" >
       State: <span class="highlight px-2">{{ node.state }}</span
       >, since {{ fromNow(node.since) }}

@@ -10,21 +10,21 @@
           Last
           <span
             v-bind:class="{ 'font-bold': selectedDays === 1 }"
-            class="24hours cursor-pointer"
+            class="24hours cursor-pointer primary"
             v-on:click="selectDays(1)"
             >24 hours</span
           >
           /
           <span
             v-bind:class="{ 'font-bold': selectedDays === 7 }"
-            class="7days cursor-pointer"
+            class="7days cursor-pointer primary"
             v-on:click="selectDays(7)"
             >7 days</span
           >
           /
           <span
             v-bind:class="{ 'font-bold': selectedDays === 28 }"
-            class="28days cursor-pointer"
+            class="28days cursor-pointer primary"
             v-on:click="selectDays(28)"
             >28 days</span
           >:
@@ -68,6 +68,7 @@
       const { id } = params;
       try {
         const nodes = await $axios.$get('/api/node-overview?id=' + id);
+        nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
         return { id, nodeOverview: nodes };
       } catch (error) {
         console.error(error);
