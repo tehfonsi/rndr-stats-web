@@ -134,7 +134,9 @@
         this.getJobOverview(days);
       },
       getNodeOverview: async function() {
-        this.nodeOverview = await this.$axios.$get('/api/node-overview?id=' + this.id);
+        const nodes = await this.$axios.$get('/api/node-overview?id=' + this.id);
+        nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
+        this.nodeOverview = nodes;
       },
       getJobOverview: async function(days) {
         if (!this.jobOverview[days]) {
