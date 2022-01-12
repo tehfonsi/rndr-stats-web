@@ -58,6 +58,17 @@
 <script>
   import Node from '../../components/node.vue';
 
+  const nodeSort = (n1, n2) => {
+    if (n1.name === n2.name) {
+      return 0;
+    } else if (!n1.name) {
+      return 1;
+    } else if (!n2.name) {
+      return -1;
+    }
+    return n1.name.localeCompare(n2.name);
+  };
+
   export default {
     data: () => {
       return {
@@ -71,7 +82,7 @@
       const { id } = params;
       try {
         const nodes = await $axios.$get('/api/node-overview?id=' + id);
-        nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
+        nodes.sort(nodeSort);
         return { id, nodeOverview: nodes };
       } catch (error) {
         console.error(error);
@@ -135,7 +146,7 @@
       },
       getNodeOverview: async function() {
         const nodes = await this.$axios.$get('/api/node-overview?id=' + this.id);
-        nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
+        nodes.sort(nodeSort);
         this.nodeOverview = nodes;
       },
       getJobOverview: async function(days) {
