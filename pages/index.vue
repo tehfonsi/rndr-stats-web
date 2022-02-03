@@ -2,8 +2,32 @@
   <section class="container">
     <div>
       <h1 class="highlight">rndr-stats <sup>beta</sup></h1>
+      <br/>
+        <span
+          ><i>Disclaimer</i>: This is a non-official community project and is
+          not associated with OTOY.</span
+        >
+      <div class="w-full text-left mt-5" v-if="utilization">
+        <div>
+          Average network utilization for the past 7 days
+        </div>
+        <table class="w-full mt-1">
+          <tr>
+            <th>OB Range</th>
+            <th>Tier</th>
+            <th>Utilization</th>
+            <th>Nodes</th>
+          </tr>
+          <tr v-for="range in utilization" :key="range.from">
+            <td>{{range.from + ' - '+  range.to}}</td>
+            <td>{{range.tier}}</td>
+            <td>{{range.utilization}} %</td>
+            <td>{{range.nodes}}</td>
+          </tr>
+        </table>
+      </div>
       <div class="w-60 text-left mt-5">
-        <span>How to get started:</span>
+        <span>How to get the dashboard for your nodes:</span>
         <ul>
           <li>
             Download
@@ -28,31 +52,6 @@
           ><i>Warning</i>: Your ETH address is sent and needed to identify your
           nodes</span
         >
-        <br />
-        <br />
-        <span
-          ><i>Disclaimer</i>: This is a non-official community project and is
-          not associated with OTOY.</span
-        >
-      </div>
-      <div class="w-full h-64 text-left mt-5" v-if="utilization">
-        <div>
-          Average network utilization for the past 7 days
-        </div>
-        <table class="w-full mt-1">
-          <tr>
-            <th>OB Range</th>
-            <th>Tier</th>
-            <th>Utilization</th>
-            <th>Nodes</th>
-          </tr>
-          <tr v-for="range in utilization" :key="range.from">
-            <td>{{range.from + ' - '+  range.to}}</td>
-            <td>{{range.tier}}</td>
-            <td>{{range.utilization}} %</td>
-            <td>{{range.nodes}}</td>
-          </tr>
-        </table>
       </div>
     </div>
   </section>
