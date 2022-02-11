@@ -2,13 +2,14 @@
   <div v-if="node">
     <div v-if="edit">
       <input :value="node.name || ''"/>
-      <span v-on:click="hideInput" class="cursor-pointer primary">Cancel</span>
+      <span v-on:click="hideInput" class="cursor-pointer primary">Cancel</span> or
       <span v-on:click="changeName" class="cursor-pointer primary">Change</span>
     </div>
     <span v-else v-on:click="showInput">Node: <span  class="primary">{{ node.name || node.gpus.split(',')[0] }}</span> / {{ node.score }} OB</span>
     <div v-on:click="toggle" >
       State: <span class="highlight px-2">{{ node.state }}</span
       >, since {{ fromNow(node.since) }}
+      <div v-if="showWarning(node.updated)" class="warning">This node might be unresponsive, last updated {{ fromNow(latestDate(node)) }} ago</div>
     </div>
     <div v-if="expanded" v-on:click="toggle" >
       <div>Total</div>
@@ -32,7 +33,7 @@
 </template>
 
 <script>
-  import { fromNow } from '../src/utils';
+  import { fromNow, timezoneCorrected } from '../src/utils';
 
   export default {
     props: {
@@ -52,7 +53,19 @@
     },
     methods: {
       fromNow: function(date) {
-        return fromNow(new Date(date));
+        return fromNow(timezoneCorrected(date));
+      },
+      latestDate: function(node) {
+        if (node.updated && node.updated > node.since) {
+          return node.updated;
+        }
+        return node.since;
+      },
+      showWarning: function(date) {
+        const hour = 1000 * 60 * 60;
+        const anHourAgo = Date.now() - hour;
+
+        return timezoneCorrected(date) < anHourAgo;
       },
       toggle: function() {
         this.state.expanded = !this.state.expanded;

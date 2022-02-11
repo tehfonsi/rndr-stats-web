@@ -66,7 +66,7 @@ const addJob = async (job) => {
 
 const getNodeOverview = async (operator_id) => {
   const con = await mysql.createConnection(CONNECTION_PARAMS);
-  const result = await con.query(`SELECT n.id, n.name, n.gpus, n.score, n.jobs_completed, n.previews_sent, n.thumbnails_sent, s.type as state, s.created as since
+  const result = await con.query(`SELECT n.id, n.name, n.updated, n.gpus, n.score, n.jobs_completed, n.previews_sent, n.thumbnails_sent, s.type as state, s.created as since
   FROM states s
     INNER JOIN nodes n ON s.node = n.id
   WHERE s.id IN (SELECT MAX(id) FROM states GROUP BY node) 
@@ -145,6 +145,15 @@ const getUtilizationOverview = async (start, end) => {
   return result;
 }
 
+const getOperatorPackage = async (operator_id) => {
+  const con = await mysql.createConnection(CONNECTION_PARAMS);
+  const result = await con.query(`select * from package 
+    where valid_until >= current_timestamp
+      and operator = ${operator_id}`);
+  await con.end();
+  return result;
+}
+
 module.exports = {
   setup,
   setOperator,
@@ -156,5 +165,6 @@ module.exports = {
   getUtilizationOverview,
   getUtilizationForAllNodes,
   getPasswords,
-  updateName
+  updateName,
+  getOperatorPackage
 }

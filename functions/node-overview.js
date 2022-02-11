@@ -9,14 +9,23 @@ const getOverview = async (event) => {
 
   let result;
   try {
-    result = await Database.getNodeOverview(parseInt(id))
+    result = await Promise.all([Database.getOperatorPackage(parseInt(id)), Database.getNodeOverview(parseInt(id))])
   } catch (error) {
     console.error(error);
     return {statusCode: 500, body: JSON.stringify(error)};
   }
+
+  const package = result[0];
+  const nodes = result[1];
+
+  if (!package.length) {
+    nodes.forEach((node) => {
+      delete node.updated;
+    })
+  }
   
   return {statusCode: 200,
-    body: JSON.stringify(result, null, 2)};
+    body: JSON.stringify(nodes, null, 2)};
 }
 
 exports.handler = async (event, _context) => {
