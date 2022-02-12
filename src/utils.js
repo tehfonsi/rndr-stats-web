@@ -9,10 +9,5 @@ module.exports = {
     if (hours < 24) {
       return `${hours.toFixed(0)} hours ${minutes.toFixed(0)} minutes`;
     }
-  },
-  timezoneCorrected: (dateString) => {
-    const date = new Date(dateString);
-    date.setTime(date.getTime() - new Date().getTimezoneOffset()*60*1000 );
-    return date;
   }
 }

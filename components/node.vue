@@ -33,7 +33,7 @@
 </template>
 
 <script>
-  import { fromNow, timezoneCorrected } from '../src/utils';
+  import { fromNow } from '../src/utils';
 
   export default {
     props: {
@@ -53,7 +53,7 @@
     },
     methods: {
       fromNow: function(date) {
-        return fromNow(timezoneCorrected(date));
+        return fromNow(new Date(date));
       },
       latestDate: function(node) {
         if (node.updated && node.updated > node.since) {
@@ -65,7 +65,7 @@
         const hour = 1000 * 60 * 60;
         const anHourAgo = Date.now() - hour;
 
-        return timezoneCorrected(date) < anHourAgo;
+        return new Date(date) < anHourAgo;
       },
       toggle: function() {
         this.state.expanded = !this.state.expanded;
