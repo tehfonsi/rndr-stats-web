@@ -12,3 +12,6 @@ status = 200
 
 [dev]
 command = "npm run dev:nuxt"
+
+[functions]
+node_bundler = "esbuild"

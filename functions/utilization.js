@@ -1,4 +1,4 @@
-const Database = require('./utils/database');
+import { getUtilizationForAllNodes } from './utils/database';
 
 const getUtilizationOverview = async (event) => {
   let {start, end} = event.queryStringParameters;
@@ -19,7 +19,7 @@ const getUtilizationOverview = async (event) => {
 
   let result;
   try {
-    result = await Database.getUtilizationForAllNodes(start, end)
+    result = await getUtilizationForAllNodes(start, end)
   } catch (error) {
     console.error(error);
     return {statusCode: 500, body: JSON.stringify(error)};
@@ -48,7 +48,7 @@ const getUtilizationOverview = async (event) => {
     body: JSON.stringify(utilization, null, 2)};
 }
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "GET") {
     return getUtilizationOverview(event);
   }

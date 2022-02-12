@@ -1,4 +1,4 @@
-const Database = require('../functions/utils/database');
+import { addJob } from '../functions/utils/database';
 
 const newJob = async (event) => {
   const {node_id, start, end, time, result} = JSON.parse(event.body);
@@ -14,7 +14,7 @@ const newJob = async (event) => {
   };
 
   try {
-    await Database.addJob(job)
+    await addJob(job)
   } catch (err) {
     console.error(err);
     return {
@@ -28,7 +28,7 @@ const newJob = async (event) => {
   };
 }
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "POST") {
     return newJob(event);
   }

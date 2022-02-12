@@ -1,5 +1,5 @@
-const hash = require('./utils/hash');
-const Database = require('../functions/utils/database');
+import hash from './utils/hash';
+import { setNode } from '../functions/utils/database';
 
 const newNode = async (event) => {
   let {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = JSON.parse(event.body);
@@ -22,7 +22,7 @@ const newNode = async (event) => {
   };
 
   try {
-    await Database.setNode(node)
+    await setNode(node)
   } catch (error) {
     console.error(error);
     return {
@@ -36,7 +36,7 @@ const newNode = async (event) => {
   };
 }
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "PUT") {
     return newNode(event);
   }

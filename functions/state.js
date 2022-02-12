@@ -1,4 +1,4 @@
-const Database = require('../functions/utils/database');
+import { addState } from '../functions/utils/database';
 
 const newState = async (event) => {
   const {type, node_id} = JSON.parse(event.body);
@@ -9,7 +9,7 @@ const newState = async (event) => {
   };
 
   try {
-      await Database.addState(state);
+      await addState(state);
   } catch (err) {
     console.error(err);
     return {
@@ -23,7 +23,7 @@ const newState = async (event) => {
   };
 }
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "POST") {
     return newState(event);
   }

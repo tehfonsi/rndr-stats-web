@@ -1,7 +1,7 @@
-const hash = require('./utils/hash');
-const Database = require('../functions/utils/database');
+import hash from './utils/hash';
+import { setOperator } from '../functions/utils/database';
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "PUT") {
     const {eth_address} = JSON.parse(event.body);
     const id = hash(eth_address);
@@ -13,7 +13,7 @@ exports.handler = async (event, _context) => {
 
     let result;
     try {
-      result = await Database.setOperator(operator)
+      result = await setOperator(operator)
     } catch (error) {
       console.error(error);
       return {

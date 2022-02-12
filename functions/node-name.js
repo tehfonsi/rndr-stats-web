@@ -1,5 +1,5 @@
-const sha256 = require('js-sha256').sha256;
-const Database = require('./utils/database');
+import { sha256 } from 'js-sha256';
+import { getPasswords, updateName } from './utils/database';
 
 const changeName = async (event) => {
   let {node_id, name, password} = JSON.parse(event.body);
@@ -8,7 +8,7 @@ const changeName = async (event) => {
 
   let savedPasswords;
   try {
-    savedPasswords = (await Database.getPasswords(node_id)).map((row) => row.password);
+    savedPasswords = (await getPasswords(node_id)).map((row) => row.password);
   } catch (error) {
     console.error(error);
     return {
@@ -29,7 +29,7 @@ const changeName = async (event) => {
   }
 
   try {
-    await Database.updateName(node_id, name);
+    await updateName(node_id, name);
   } catch (error) {
     console.error(error);
     return {
@@ -43,7 +43,7 @@ const changeName = async (event) => {
   };
 }
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "POST") {
     return changeName(event);
   }

@@ -1,4 +1,4 @@
-const Database = require('./utils/database');
+import { getJobOverview } from './utils/database';
 
 const getOverview = async (event) => {
   let {id, start, end} = event.queryStringParameters;
@@ -23,7 +23,7 @@ const getOverview = async (event) => {
 
   let result;
   try {
-    result = await Database.getJobOverview(parseInt(id), start, end)
+    result = await getJobOverview(parseInt(id), start, end)
   } catch (error) {
     console.error(error);
     return {statusCode: 500, body: JSON.stringify(error)};
@@ -33,7 +33,7 @@ const getOverview = async (event) => {
     body: JSON.stringify(result, null, 2)};
 }
 
-exports.handler = async (event, _context) => {
+export async function handler(event, _context) {
   if (event.httpMethod === "GET") {
     return getOverview(event);
   }
