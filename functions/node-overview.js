@@ -1,4 +1,4 @@
-const Database = require('./utils/database');
+const Database = require('./utils/database.js');
 
 const getOverview = async (event) => {
   const {id} = event.queryStringParameters;
@@ -7,9 +7,11 @@ const getOverview = async (event) => {
     return {statusCode: 400, body: 'id parameter is missing'};
   }
 
+  const operatorId = parseInt(id);
+
   let result;
   try {
-    result = await Promise.all([Database.getOperatorPackage(parseInt(id)), Database.getNodeOverview(parseInt(id))])
+    result = await Promise.all([Database.getOperatorPackage(operatorId), Database.getNodeOverview(operatorId)]);
   } catch (error) {
     console.error(error);
     return {statusCode: 500, body: JSON.stringify(error)};
