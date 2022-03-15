@@ -1,7 +1,7 @@
-const Database = require('../functions/utils/database');
+import { setup } from '../functions/utils/database';
 
 const bootstrap = async () => {
-  await Database.setup();
+  await setup();
 }
 
 bootstrap();

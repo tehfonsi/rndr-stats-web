@@ -111,7 +111,13 @@
         if (!this.nodeOverview) {
           return [];
         }
-        return this.nodeOverview;
+        // hide nodes which did not update for 7 days
+        return this.nodeOverview.filter((n) => {
+              const day = 1000 * 60 * 60 * 24;
+              return Date.now() - new Date(n.since).getTime() < (day * 7);
+          });
+        // // filter nodes with no jobs in this timeframe
+        // return this.nodeOverview.filter((n) => !!n.jobs);
       },
       overview: function() {
         const overview = {
