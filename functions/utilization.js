@@ -1,5 +1,11 @@
 import { getUtilizationForAllNodes } from './utils/database';
 
+const CACHE = new Map();
+
+const getKey = (start,end) => {
+  return `${start}-${end}`;
+}
+
 const getUtilizationOverview = async (event) => {
   let {start, end} = event.queryStringParameters;
 
@@ -15,6 +21,15 @@ const getUtilizationOverview = async (event) => {
     end = new Date().toISOString();
   } else {
     end = new Date(parseInt(end * 1000)).toISOString();
+  }
+
+  const key = getKey(start,end);
+
+  if (CACHE.has(key)) {
+    const utilization = CACHE.get(key);
+    return {statusCode: 200, 
+    headers: {'Cache-Control': 'public, s-maxage=3600'},
+    body: JSON.stringify(utilization, null, 2)};
   }
 
   let result;
@@ -42,6 +57,11 @@ const getUtilizationOverview = async (event) => {
       object.utilization = (object.utilization + node.utilization) / 2;
     }
   });
+
+  if (CACHE.size > 5) {
+    CACHE.clear();
+  }
+  CACHE.set(key, utilization);
   
   return {statusCode: 200, 
     headers: {'Cache-Control': 'public, s-maxage=3600'},
