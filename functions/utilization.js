@@ -24,6 +24,7 @@ const getUtilizationOverview = async (event) => {
   }
 
   const key = getKey(start,end);
+  console.log(key);
 
   if (CACHE.has(key)) {
     const utilization = CACHE.get(key);

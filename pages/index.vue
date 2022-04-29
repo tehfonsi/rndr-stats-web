@@ -9,7 +9,20 @@
         >
       <div class="w-full text-left mt-5" v-if="utilization">
         <div>
-          Average network utilization for the past 7 days
+          Average network utilization:
+          <span
+            v-bind:class="{ 'font-bold': selectedDays === 1 }"
+            class="24hours cursor-pointer primary"
+            v-on:click="selectDays(1)"
+            >Yesterday</span
+          >
+          /
+          <span
+            v-bind:class="{ 'font-bold': selectedDays === 7 }"
+            class="24hours cursor-pointer primary"
+            v-on:click="selectDays(7)"
+            >Last week</span
+          >
         </div>
         <table class="w-full mt-1">
           <tr>
@@ -61,19 +74,23 @@
   export default {
     data: () => {
       return {
-        utilization: null
+        utilization: null,
+        selectedDays: 7,
       };
     },
     mounted() {
-      this.getUtilization();
+      this.getUtilization(7)
     },
     methods: {
-      getUtilization: async function() {
+      selectDays: function(days) {
+        this.getUtilization(days);
+      },
+      getUtilization: async function(days) {
         const endDate = new Date();
         endDate.setDate(endDate.getDate() - 1);
         endDate.setUTCHours(23,59,59,999);
         const startDate = new Date();
-        startDate.setDate(endDate.getDate() - 7);
+        startDate.setDate(endDate.getDate() - days);
         startDate.setUTCHours(0,0,0,0);
         const start = parseInt(startDate.getTime() / 1000);
         const end = parseInt(endDate.getTime() / 1000);
@@ -98,6 +115,7 @@
         });
         data.sort((e1, e2) => e1.from - e2.from)
         this.utilization = data.filter((d) => d.utilization > 0);
+        this.selectedDays = days;
       },
     },
   }
