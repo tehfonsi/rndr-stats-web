@@ -6,6 +6,9 @@
     </div>
     <ul v-else>
       <div v-if="nodes">
+        <div class="my-5 mr-5">
+          Please consider donating to support running the servers and keep the dashboard available.<br/>You can donate RNDR to this MetaMask wallet: <span class="primary">0xF34913F977a2f4630339a76955Baa859614f6dDb</span>
+        </div>
         <div>
           Last
           <span
