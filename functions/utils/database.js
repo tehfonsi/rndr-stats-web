@@ -81,7 +81,9 @@ export const getUtilizationForAllNodes = async (start, end) => {
       sum(j.time) / 60 / 60 / TIMESTAMPDIFF(HOUR, "${start}", "${end}") as utilization
     from jobs j
       inner join nodes n ON j.node = n.id
-    where start >= "${start}" AND start <= "${end}"
+    where 
+    j.id > (select max(id) from jobs where start < "${start}")
+    and start >= "${start}" AND start <= "${end}"
     group by node`);
   await con.end();
   return result;
