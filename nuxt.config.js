@@ -22,6 +22,13 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+    ],
+    script: [
+      {
+        "data-website-id": "db465924-febe-4936-a805-e9667d787915",
+        src: "https://umami.tehfonsi.com/script.js",
+        async: true,
+      }
     ]
   },
 
