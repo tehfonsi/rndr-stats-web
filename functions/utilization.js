@@ -26,12 +26,12 @@ const getUtilizationOverview = async (event) => {
   const key = getKey(start,end);
   console.log(key);
 
-  if (CACHE.has(key)) {
-    const utilization = CACHE.get(key);
-    return {statusCode: 200, 
-    headers: {'Cache-Control': 'public, s-maxage=3600'},
-    body: JSON.stringify(utilization, null, 2)};
-  }
+  // if (CACHE.has(key)) {
+  //   const utilization = CACHE.get(key);
+  //   return {statusCode: 200, 
+  //   headers: {'Cache-Control': 'public, s-maxage=3600'},
+  //   body: JSON.stringify(utilization, null, 2)};
+  // }
 
   let result;
   try {

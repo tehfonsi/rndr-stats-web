@@ -83,14 +83,14 @@ export const getNodeOverview = async (operator_id) => {
 
 export const getUtilizationForAllNodes = async (start, end) => {
   const con = await createConnection(CONNECTION_PARAMS);
-  const result = await con.query(`select n.id, n.gpus, n.score, count(*) as job_count, sum(j.time) as total, 
+  const query = `select n.id, n.gpus, n.score, count(*) as job_count, sum(j.time) as total, 
       sum(j.time) / 60 / 60 / TIMESTAMPDIFF(HOUR, "${start}", "${end}") as utilization
     from jobs j
       inner join nodes n ON j.node = n.id
-    where 
-    j.id > (select max(id) from jobs where start < "${start}")
-    and start >= "${start}" AND start <= "${end}"
-    group by node`);
+    where start >= "${start}" AND end <= "${end}"
+    and time < 100000
+    group by j.node`;
+  const result = await con.query(query);
   await con.end();
   return result;
 };
