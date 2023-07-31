@@ -111,7 +111,8 @@ export const getJobOverview = async (operator_id, start, end) => {
 export const getPasswords = async (node_id) => {
   const con = await createConnection(CONNECTION_PARAMS);
   const result = await con.query(`select password from nodes
-    where operator = (select operator from nodes where id = '${node_id}')`);
+    where operator = (select operator from nodes where id = '${node_id}')
+    and updated > DATE_SUB(NOW(), INTERVAL 1 MONTH)`);
   await con.end();
   return result;
 }
