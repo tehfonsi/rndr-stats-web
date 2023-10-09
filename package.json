@@ -4,21 +4,21 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@nuxtjs/axios": "^5.13.6",
-    "cross-env": "^5.2.0",
-    "js-sha256": "^0.9.0",
-    "node-fetch": "^2.6.6",
-    "nuxt": "^2.15.8",
-    "promise-mysql": "^5.0.4"
+    "@nuxtjs/axios": "5.13.6",
+    "cross-env": "5.2.0",
+    "js-sha256": "0.9.0",
+    "node-fetch": "2.6.6",
+    "nuxt": "2.15.8",
+    "promise-mysql": "5.0.4"
   },
   "devDependencies": {
-    "netlify-cli": "^8.0.3",
-    "nodemon": "^1.18.9",
-    "eslint-config-prettier": "^4.1.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.16.4",
-    "autoprefixer": "^8.6.4",
-    "tailwindcss": "^0.7.0"
+    "netlify-cli": "11.8.0",
+    "nodemon": "1.18.9",
+    "eslint-config-prettier": "4.1.0",
+    "eslint-plugin-prettier": "3.0.1",
+    "prettier": "1.16.4",
+    "autoprefixer": "8.6.4",
+    "tailwindcss": "0.7.0"
   },
   "scripts": {
     "bootstrap": "netlify dev:exec node ./scripts/setup.js",
@@ -38,5 +38,8 @@
   "bugs": {
     "url": "https://github.com/tehfonsi/rndr-stats-web/issues"
   },
-  "homepage": "https://github.com/tehfonsi/rndr-stats-web#readme"
+  "homepage": "https://github.com/tehfonsi/rndr-stats-web#readme",
+  "volta": {
+    "node": "16.16.0"
+  }
 }

@@ -7,7 +7,11 @@
     <ul v-else>
       <div v-if="nodes">
         <div class="my-5 mr-5">
-          Please consider donating to support running the servers and keep the dashboard available.<br/>You can donate RNDR to this MetaMask wallet: <span class="primary">0xF34913F977a2f4630339a76955Baa859614f6dDb</span>
+          Please consider donating to support running the servers and keep the
+          dashboard available.<br />You can donate RNDR to this MetaMask wallet:
+          <span class="primary"
+            >0xF34913F977a2f4630339a76955Baa859614f6dDb</span
+          >
         </div>
         <div>
           Last
@@ -59,137 +63,140 @@
 </template>
 
 <script>
-  import Node from '../../components/node.vue';
+import Node from '../../components/node.vue';
 
-  const nodeSort = (n1, n2) => {
-    if (n1.name === n2.name) {
-      return 0;
-    } else if (!n1.name) {
-      return 1;
-    } else if (!n2.name) {
-      return -1;
+const nodeSort = (n1, n2) => {
+  if (n1.name === n2.name) {
+    return 0;
+  } else if (!n1.name) {
+    return 1;
+  } else if (!n2.name) {
+    return -1;
+  }
+  return n1.name.localeCompare(n2.name);
+};
+
+export default {
+  data: () => {
+    return {
+      id: null,
+      nodeOverview: null,
+      jobOverview: {},
+      selectedDays: 1,
+    };
+  },
+  async asyncData({ params, $axios }) {
+    const { id } = params;
+    try {
+      const nodes = await $axios.$get('/api/node-overview?id=' + id);
+      nodes.sort(nodeSort);
+      return { id, nodeOverview: nodes };
+    } catch (error) {
+      console.error(error);
     }
-    return n1.name.localeCompare(n2.name);
-  };
+    return { id, nodeOverview: null };
+  },
+  mounted() {
+    const days = window.localStorage.getItem('days');
+    if (days) {
+      this.selectedDays = parseInt(days);
+    }
+    this.getJobOverview(this.selectedDays);
 
-  export default {
-    data: () => {
-      return {
-        id: null,
-        nodeOverview: null,
-        jobOverview: {},
-        selectedDays: 1,
-      };
-    },
-    async asyncData({ params, $axios }) {
-      const { id } = params;
-      try {
-        const nodes = await $axios.$get('/api/node-overview?id=' + id);
-        nodes.sort(nodeSort);
-        return { id, nodeOverview: nodes };
-      } catch (error) {
-        console.error(error);
+    // update job stats when tab/page becomes visible again
+    const onVisibilityChanged = async () => {
+      if (document.visibilityState === 'visible') {
+        await this.getNodeOverview();
+        this.jobOverview = {};
+        await this.getJobOverview(this.selectedDays);
       }
-      return { id, nodeOverview: null };
-    },
-    mounted() {
-      const days = window.localStorage.getItem('days');
-      if (days) {
-        this.selectedDays = parseInt(days);
+    };
+    document.addEventListener(
+      'visibilitychange',
+      onVisibilityChanged.bind(this)
+    );
+  },
+  computed: {
+    nodes: function() {
+      if (!this.nodeOverview) {
+        return [];
       }
-      this.getJobOverview(this.selectedDays);
-
-      // update job stats when tab/page becomes visible again
-      const onVisibilityChanged = async () => {
-        if (document.visibilityState === 'visible') {
-          await this.getNodeOverview();
-          this.jobOverview = {};
-          await this.getJobOverview(this.selectedDays);
-        }
-      };
-      document.addEventListener("visibilitychange", onVisibilityChanged.bind(this));
+      // hide nodes which did not update for 7 days
+      return this.nodeOverview.filter((n) => {
+        const day = 1000 * 60 * 60 * 24;
+        return Date.now() - new Date(n.since).getTime() < day * 7;
+      });
+      // // filter nodes with no jobs in this timeframe
+      // return this.nodeOverview.filter((n) => !!n.jobs);
     },
-    computed: {
-      nodes: function() {
-        if (!this.nodeOverview) {
-          return [];
+    overview: function() {
+      const overview = {
+        income: 0,
+        tier3_utilization: 0,
+        tier2_utilization: 0,
+      };
+      let tier3_count = 0;
+      let tier2_count = 0;
+      this.nodes.forEach((node) => {
+        if (!node.jobs?.income) return;
+        overview.income += node.jobs.income || 0;
+        if (node.score < 301) {
+          overview.tier3_utilization += node.jobs.utilization;
+          tier3_count++;
+        } else {
+          overview.tier2_utilization += node.jobs.utilization;
+          tier2_count++;
         }
-        // hide nodes which did not update for 7 days
-        return this.nodeOverview.filter((n) => {
-              const day = 1000 * 60 * 60 * 24;
-              return Date.now() - new Date(n.since).getTime() < (day * 7);
-          });
-        // // filter nodes with no jobs in this timeframe
-        // return this.nodeOverview.filter((n) => !!n.jobs);
-      },
-      overview: function() {
-        const overview = {
-          income: 0,
-          tier3_utilization: 0,
-          tier2_utilization: 0,
-        };
-        let tier3_count = 0;
-        let tier2_count = 0;
-        this.nodes.forEach((node) => {
-          if (!node.jobs?.income) return;
-          overview.income += node.jobs.income || 0;
-          if (node.score < 300) {
-            overview.tier3_utilization += node.jobs.utilization;
-            tier3_count++;
-          } else {
-            overview.tier2_utilization += node.jobs.utilization;
-            tier2_count++;
+      });
+      overview.utilization =
+        (overview.tier3_utilization + overview.tier2_utilization) /
+        (tier3_count + tier2_count);
+      overview.tier3_utilization /= tier3_count;
+      overview.tier2_utilization /= tier2_count;
+      return overview;
+    },
+  },
+  methods: {
+    selectDays: function(days) {
+      this.getJobOverview(days);
+    },
+    getNodeOverview: async function() {
+      const nodes = await this.$axios.$get('/api/node-overview?id=' + this.id);
+      nodes.sort(nodeSort);
+      this.nodeOverview = nodes;
+    },
+    getJobOverview: async function(days) {
+      if (!this.jobOverview[days]) {
+        const d = new Date();
+        d.setDate(d.getDate() - days);
+        const start = parseInt(d.getTime() / 1000);
+        const jobs = await this.$axios.$get(
+          `/api/job-overview?id=${this.id}&start=${start}`
+        );
+        this.jobOverview[days] = jobs;
+      }
+      window.localStorage.setItem('days', days);
+      this.addJobsToNodes(days);
+    },
+    addJobsToNodes: function(days) {
+      const nodes = this.nodeOverview;
+      if (this.jobOverview[days]) {
+        nodes.forEach((node) => {
+          const job =
+            this.jobOverview[days].find((job) => job.id === node.id) ||
+            undefined;
+          if (job) {
+            job.income =
+              (days * 24 * job.utilization * node.score) /
+              (node.score < 300 ? 200 : 100);
           }
+          node.jobs = job;
         });
-        overview.utilization =
-          (overview.tier3_utilization + overview.tier2_utilization) /
-          (tier3_count + tier2_count);
-        overview.tier3_utilization /= tier3_count;
-        overview.tier2_utilization /= tier2_count;
-        return overview;
-      },
+      }
+      this.nodeOverview = JSON.parse(JSON.stringify(nodes));
+      this.selectedDays = days;
     },
-    methods: {
-      selectDays: function(days) {
-        this.getJobOverview(days);
-      },
-      getNodeOverview: async function() {
-        const nodes = await this.$axios.$get('/api/node-overview?id=' + this.id);
-        nodes.sort(nodeSort);
-        this.nodeOverview = nodes;
-      },
-      getJobOverview: async function(days) {
-        if (!this.jobOverview[days]) {
-          const d = new Date();
-          d.setDate(d.getDate() - days);
-          const start = parseInt(d.getTime() / 1000);
-          const jobs = await this.$axios.$get(
-            `/api/job-overview?id=${this.id}&start=${start}`
-          );
-          this.jobOverview[days] = jobs;
-        }
-        window.localStorage.setItem('days', days);
-        this.addJobsToNodes(days);
-      },
-      addJobsToNodes: function(days) {
-        const nodes = this.nodeOverview;
-        if (this.jobOverview[days]) {
-          nodes.forEach((node) => {
-            const job =
-              this.jobOverview[days].find((job) => job.id === node.id) ||
-              undefined;
-            if (job) {
-              job.income =
-                (days * 24 * job.utilization * node.score) /
-                (node.score < 300 ? 200 : 100);
-            }
-            node.jobs = job;
-          });
-        }
-        this.nodeOverview = JSON.parse(JSON.stringify(nodes));
-        this.selectedDays = days;
-      },
-    },
-    components: { Node },
-  };
+  },
+  components: { Node },
+};
 </script>

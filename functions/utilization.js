@@ -42,13 +42,15 @@ const getUtilizationOverview = async (event) => {
   }
 
   const utilization = [
-    {from: 0, to: 99, tier: 3, nodes: 0, utilization: 0.0},
+    {from: 1, to: 99, tier: 3, nodes: 0, utilization: 0.0},
     {from: 100, to: 199, tier: 3, nodes: 0, utilization: 0.0},
-    {from: 200, to: 299, tier: 3, nodes: 0, utilization: 0.0},
-    {from: 300, to: 999, tier: 2, nodes: 0, utilization: 0.0},
+    {from: 200, to: 300, tier: 3, nodes: 0, utilization: 0.0},
+    {from: 301, to: 999, tier: 2, nodes: 0, utilization: 0.0},
     {from: 1000, to: 1999, tier: 2, nodes: 0, utilization: 0.0},
     {from: 2000, to: 3999, tier: 2, nodes: 0, utilization: 0.0},
     {from: 4000, to: 9999, tier: 2, nodes: 0, utilization: 0.0},
+    {from: 10000, to: 14999, tier: 2, nodes: 0, utilization: 0.0},
+    {from: 15000, to: 20000, tier: 2, nodes: 0, utilization: 0.0},
   ];
 
   result.forEach((node) => {
