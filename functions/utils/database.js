@@ -131,8 +131,8 @@ export const getUtilizationOverview = async (start, end) => {
   const result = await con.query(`select score_range, summary.utilization, summary.total as time, summary.job_count
     from (select case when u.score >= 0 and u.score <= 99 then '0 - 99'
                 when u.score >= 100 and u.score <= 199 then '100 - 199'
-                when u.score >= 200 and u.score <= 299 then '200 - 299'
-                when u.score >= 300 and u.score <= 999 then '300 - 999'
+                when u.score >= 200 and u.score <= 300 then '200 - 300'
+                when u.score >= 301 and u.score <= 999 then '300 - 999'
                 when u.score >= 1000 and u.score <= 1999 then '1000 - 1999'
                 when u.score >= 2000 and u.score <= 3999 then '2000 - 3999'
                 else '4000 - 9999'

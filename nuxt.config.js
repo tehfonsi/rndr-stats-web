@@ -25,7 +25,7 @@ export default {
     ],
     script: [
       {
-        "data-website-id": "db465924-febe-4936-a805-e9667d787915",
+        "data-website-id": "9f317854-b13f-41fb-a0e4-7f81d0fb86ab",
         src: "https://umami.tehfonsi.com/script.js",
         async: true,
       }
