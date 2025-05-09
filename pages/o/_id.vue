@@ -8,9 +8,12 @@
       <div v-if="nodes">
         <div class="my-5 mr-5">
           Please consider donating to support running the servers and keep the
-          dashboard available.<br />You can donate RNDR to this MetaMask wallet:
-          <span class="primary"
-            >0xF34913F977a2f4630339a76955Baa859614f6dDb</span
+          dashboard available.<br />You can donate RENDER to this Solana wallet:
+          <a
+            class="primary animated-gradient-text hover:cursor"
+            href="https://solscan.io/account/B5zXiU35tGvcJv5EZZ6fDn7cVHc8pDHqP2waanBU1Pj1"
+            target="_blank"
+            >B5zXiU35tGvcJv5EZZ6fDn7cVHc8pDHqP2waanBU1Pj1</a
           >
         </div>
         <div>
@@ -200,3 +203,43 @@ export default {
   components: { Node },
 };
 </script>
+
+<style>
+/* Custom CSS for the animated gradient text */
+.animated-gradient-text {
+  /* Set the background to a gradient */
+  background-image: linear-gradient(
+    to right,
+    #ef4444,
+    /* red-500 */ #f97316,
+    /* orange-500 */ #eab308,
+    /* yellow-500 */ #22c55e,
+    /* green-500 */ #3b82f6,
+    /* blue-500 */ #8b5cf6,
+    /* violet-500 */ #ec4899 /* pink-500 */
+  );
+  /* Set the background size to be larger than the text */
+  /* This allows the gradient to move */
+  background-size: 200% auto;
+  /* Clip the background to the text */
+  -webkit-background-clip: text;
+  background-clip: text;
+  /* Make the text color transparent so the background shows through */
+  color: transparent;
+  /* Animate the background position */
+  animation: gradientMove 5s linear infinite;
+}
+
+/* Keyframes for the gradient movement */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%; /* Start position */
+  }
+  50% {
+    background-position: 100% 50%; /* Middle position */
+  }
+  100% {
+    background-position: 0% 50%; /* End position (loops back to start) */
+  }
+}
+</style>
