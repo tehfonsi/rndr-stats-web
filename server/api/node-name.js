@@ -1,8 +1,8 @@
 import { sha256 } from 'js-sha256';
 import { getPasswords, updateName } from './utils/database';
 
-const changeName = async (event) => {
-  let {node_id, name, password} = JSON.parse(event.body);
+const changeName = async (req, res) => {
+  let {node_id, name, password} = req.body;
 
   password = sha256(password);
 
@@ -11,10 +11,8 @@ const changeName = async (event) => {
     savedPasswords = (await getPasswords(node_id)).map((row) => row.password);
   } catch (error) {
     console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error)
-    };
+    res.status(500).json(error);
+    return;
   }
 
   const correctPassword = savedPasswords.map((p) => p !== null && p === password).reduce((p, c) => p && c);
@@ -22,30 +20,24 @@ const changeName = async (event) => {
   if (!correctPassword) {
     await new Promise(r => setTimeout(r, 1000));
     console.warn('Wrong password');
-    return {
-      statusCode: 403,
-      body: 'Password does not match'
-    };
+    res.status(403).send('Password does not match');
+    return;
   }
 
   try {
     await updateName(node_id, name);
   } catch (error) {
     console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error)
-    };
+    res.status(500).json(error);
+    return;
   }
   
-  return {
-    statusCode: 200
-  };
+  res.status(200).send();
 }
 
-export async function handler(event, _context) {
-  if (event.httpMethod === "POST") {
-    return changeName(event);
+export default async function (req, res) {
+  if (req.method === "POST") {
+    return changeName(req, res);
   }
-  return { statusCode: 405, body: "Method Not Allowed" };
+  res.status(405).send("Method Not Allowed");
 }

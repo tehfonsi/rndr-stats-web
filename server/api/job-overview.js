@@ -1,7 +1,7 @@
 import { getJobOverview } from './utils/database';
 
-const getOverview = async (event) => {
-  let {id, start, end} = event.queryStringParameters;
+const getOverview = async (req, res) => {
+  let {id, start, end} = req.query;
 
   if (!start) {
     var d = new Date();
@@ -18,7 +18,8 @@ const getOverview = async (event) => {
   }
 
   if (!id) {
-    return {statusCode: 400, body: 'id parameter is missing'};
+    res.status(400).send('id parameter is missing');
+    return;
   }
 
   let result;
@@ -26,16 +27,16 @@ const getOverview = async (event) => {
     result = await getJobOverview(parseInt(id), start, end)
   } catch (error) {
     console.error(error);
-    return {statusCode: 500, body: JSON.stringify(error)};
+    res.status(500).json(error);
+    return;
   }
   
-  return {statusCode: 200,
-    body: JSON.stringify(result, null, 2)};
+  res.status(200).json(result);
 }
 
-export async function handler(event, _context) {
-  if (event.httpMethod === "GET") {
-    return getOverview(event);
+export default async function (req, res) {
+  if (req.method === "GET") {
+    return getOverview(req, res);
   }
-  return { statusCode: 405, body: "Method Not Allowed" };
+  res.status(405).send("Method Not Allowed");
 }

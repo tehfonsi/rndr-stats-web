@@ -1,8 +1,8 @@
 import hash from './utils/hash';
-import { setNode } from '../functions/utils/database';
+import { setNode } from './utils/database';
 
-const newNode = async (event) => {
-  let {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = JSON.parse(event.body);
+const newNode = async (req, res) => {
+  let {eth_address, node_id, score, previews_sent, jobs_completet, thumbnails_sent, gpus, password} = req.body;
   const operator_id = hash(eth_address);
 
   score = !!score ? parseInt(score) : 0;
@@ -25,20 +25,16 @@ const newNode = async (event) => {
     await setNode(node)
   } catch (error) {
     console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error)
-    };
+    res.status(500).json(error);
+    return;
   }
   
-  return {
-    statusCode: 200
-  };
+  res.status(200).send();
 }
 
-export async function handler(event, _context) {
-  if (event.httpMethod === "PUT") {
-    return newNode(event);
+export default async function (req, res) {
+  if (req.method === "PUT") {
+    return newNode(req, res);
   }
-  return { statusCode: 405, body: "Method Not Allowed" };
+  res.status(405).send("Method Not Allowed");
 }

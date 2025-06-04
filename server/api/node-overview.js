@@ -1,10 +1,11 @@
 import { getOperatorPackage, getNodeOverview } from './utils/database.js';
 
-const getOverview = async (event) => {
-  const {id} = event.queryStringParameters;
+const getOverview = async (req, res) => {
+  const {id} = req.query;
 
   if (!id) {
-    return {statusCode: 400, body: 'id parameter is missing'};
+    res.status(400).send('id parameter is missing');
+    return;
   }
 
   const operatorId = parseInt(id);
@@ -14,7 +15,8 @@ const getOverview = async (event) => {
     result = await Promise.all([getOperatorPackage(operatorId), getNodeOverview(operatorId)]);
   } catch (error) {
     console.error(error);
-    return {statusCode: 500, body: JSON.stringify(error)};
+    res.status(500).json(error);
+    return;
   }
 
   const pckg = result[0];
@@ -26,13 +28,12 @@ const getOverview = async (event) => {
     })
   }
   
-  return {statusCode: 200,
-    body: JSON.stringify(nodes, null, 2)};
+  res.status(200).json(nodes);
 }
 
-export async function handler(event, _context) {
-  if (event.httpMethod === "GET") {
-    return getOverview(event);
+export default async function (req, res) {
+  if (req.method === "GET") {
+    return getOverview(req, res);
   }
-  return { statusCode: 405, body: "Method Not Allowed" };
+  res.status(405).send("Method Not Allowed");
 }

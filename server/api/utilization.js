@@ -6,8 +6,8 @@ const getKey = (start,end) => {
   return `${start}-${end}`;
 }
 
-const getUtilizationOverview = async (event) => {
-  let {start, end} = event.queryStringParameters;
+const getUtilizationOverview = async (req, res) => {
+  let {start, end} = req.query;
 
   if (!start) {
     var d = new Date();
@@ -28,9 +28,9 @@ const getUtilizationOverview = async (event) => {
 
   // if (CACHE.has(key)) {
   //   const utilization = CACHE.get(key);
-  //   return {statusCode: 200, 
-  //   headers: {'Cache-Control': 'public, s-maxage=3600'},
-  //   body: JSON.stringify(utilization, null, 2)};
+  //   res.setHeader('Cache-Control', 'public, s-maxage=3600');
+  //   res.status(200).json(utilization);
+  //   return;
   // }
 
   let result;
@@ -38,7 +38,8 @@ const getUtilizationOverview = async (event) => {
     result = await getUtilizationForAllNodes(start, end)
   } catch (error) {
     console.error(error);
-    return {statusCode: 500, body: JSON.stringify(error)};
+    res.status(500).json(error);
+    return;
   }
 
   const utilization = [
@@ -66,14 +67,13 @@ const getUtilizationOverview = async (event) => {
   }
   CACHE.set(key, utilization);
   
-  return {statusCode: 200, 
-    headers: {'Cache-Control': 'public, s-maxage=3600'},
-    body: JSON.stringify(utilization, null, 2)};
+  res.setHeader('Cache-Control', 'public, s-maxage=3600');
+  res.status(200).json(utilization);
 }
 
-export async function handler(event, _context) {
-  if (event.httpMethod === "GET") {
-    return getUtilizationOverview(event);
+export default async function (req, res) {
+  if (req.method === "GET") {
+    return getUtilizationOverview(req, res);
   }
-  return { statusCode: 405, body: "Method Not Allowed" };
+  res.status(405).send("Method Not Allowed");
 }
