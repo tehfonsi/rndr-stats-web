@@ -42,6 +42,7 @@
 
 <script>
 import { fromNow } from '../src/utils';
+import { useRuntimeConfig } from '#app'; // Or 'nuxt/app' for Nuxt 3
 
 export default {
   props: {
@@ -94,24 +95,37 @@ export default {
     },
     changeName: async function() {
       const password = prompt('Enter your password', '');
+      if (password === null) return; // User cancelled prompt
+
       const input = this.$el.querySelector('input');
       const name = input.value;
       this.hideInput();
-      const result = await this.$axios
-        .$post('/api/node-name', {
-          node_id: this.node.id,
-          name,
-          password,
-        })
-        .catch((error) => {
-          if (error.response.status === 403) {
-            alert(
-              'Wrong password! Make sure you set the same password in the .ini file of all nodes.'
-            );
+
+      const runtimeConfig = useRuntimeConfig();
+      const apiBaseUrl = runtimeConfig.public.apiBaseUrl;
+
+      try {
+        // Using $fetch, which is Nuxt 3's global utility
+        await $fetch(`${apiBaseUrl}/api/node-name`, { // Removed 'result =' as original didn't robustly use it for success
+          method: 'POST',
+          body: {
+            node_id: this.node.id,
+            name,
+            password,
           }
         });
-      if (result !== undefined) {
+        // If $fetch completes without throwing, it's a success (2xx)
         this.node.name = name;
+      } catch (error) {
+        // $fetch throws an error for non-2xx responses
+        // error.data often contains the parsed error body from the server
+        if (error.response && error.response.status === 403) {
+          alert('Wrong password! Make sure you set the same password in the .ini file of all nodes.');
+        } else {
+          console.error('Error changing name:', error);
+          // Use error.data if available, otherwise a generic message
+          alert(error.data?.error || error.data?.message || 'An error occurred while changing the node name.');
+        }
       }
     },
   },

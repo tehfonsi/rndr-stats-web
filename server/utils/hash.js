@@ -7,7 +7,7 @@
  * @param {integer} [seed] optionally pass the hash of the previous chunk
  * @returns {integer | string}
  */
- module.exports = function hashFnv32a(str, seed) {
+export default function hashFnv32a(str, seed) {
   /*jshint bitwise:false */
   var i, l,
       hval = (seed === undefined) ? 0x811c9dc5 : seed;
