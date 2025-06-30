@@ -1,7 +1,0 @@
-# create operator
-PUT http://localhost:8888/api/operator HTTP/1.1
-content-type: application/json
-
-{
-"eth_address": "0xf675F37AA8Db2d0424EB173BF5F10a33FCB27270"
-}

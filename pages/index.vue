@@ -25,23 +25,27 @@
           >
         </div>
         <table class="w-full mt-1">
-          <tr>
-            <th>OB Range</th>
-            <th>Tier</th>
-            <th>Utilization</th>
-            <th>Nodes</th>
-          </tr>
-          <tr v-for="range in utilization" :key="range.from">
-            <td>{{range.from + ' - '+  range.to}}</td>
-            <td>{{range.tier}}</td>
-            <td>{{range.utilization}} %</td>
-            <td>{{range.nodes}}</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>OB Range</th>
+              <th>Tier</th>
+              <th>Utilization</th>
+              <th>Nodes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="range in utilization" :key="range.from">
+              <td>{{range.from + ' - '+  range.to}}</td>
+              <td>{{range.tier}}</td>
+              <td>{{range.utilization}} %</td>
+              <td>{{range.nodes}}</td>
+            </tr>
+          </tbody>
         </table>
       </div>
-      <div class="w-60 text-left mt-5">
+      <div class="w-full text-left mt-5">
         <span>How to get the dashboard for your nodes:</span>
-        <ul>
+        <ul class="list-disc list-inside">
           <li>
             Download
             <a href="https://github.com/tehfonsi/rndr-watchdog" target="_blank"
@@ -70,55 +74,73 @@
   </section>
 </template>
 
-<script>
-  export default {
-    data: () => {
-      return {
-        utilization: null,
-        selectedDays: 7,
-      };
-    },
-    mounted() {
-      this.getUtilization(7)
-    },
-    methods: {
-      selectDays: function(days) {
-        this.getUtilization(days);
-      },
-      getUtilization: async function(days) {
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() - 1);
-        endDate.setUTCHours(23,59,59,999);
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - days);
-        startDate.setUTCHours(0,0,0,0);
-        const start = parseInt(startDate.getTime() / 1000);
-        const end = parseInt(endDate.getTime() / 1000);
-        const result = await this.$axios.$get(
-          `/api/utilization?start=${start}&end=${end}`
-        );
-        const data = result.map((u) => {
-          u.range = u.from + ' - ' + u.to;
-          if (u.nodes > 80) {
-            u.nodes = '80+';
-          } else if (u.nodes > 40) {
-            u.nodes = '40+';
-          } else if (u.nodes > 20) {
-            u.nodes = '20+';
-          } else if (u.nodes > 10) {
-            u.nodes = '10+';
-          } else {
-            u.nodes = ''+u.nodes;
-          }
-          u.utilization = (u.utilization * 100).toFixed(2);
-          return u;
-        });
-        data.sort((e1, e2) => e1.from - e2.from)
-        this.utilization = data.filter((d) => d.utilization > 0);
-        this.selectedDays = days;
-      },
-    },
+<script setup lang="ts">
+
+interface UtilizationRange {
+  from: number;
+  to: number;
+  tier: string;
+  utilization: string; // as percentage string, e.g. '12.34'
+  nodes: string; // e.g. '10+', '80+', etc
+  range: string;
+}
+
+const utilization = ref<UtilizationRange[] | null>(null);
+const selectedDays = ref<number>(7);
+
+function selectDays(days: number): void {
+  getUtilization(days);
+}
+
+async function getUtilization(days: number): Promise<void> {
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() - 1);
+  endDate.setUTCHours(23,59,59,999);
+  const startDate = new Date();
+  startDate.setDate(endDate.getDate() - days);
+  startDate.setUTCHours(0,0,0,0);
+  const start = Math.floor(startDate.getTime() / 1000);
+  const end = Math.floor(endDate.getTime() / 1000);
+  const data = await $fetch<any[]>(
+    `/api/utilization?start=${start}&end=${end}`
+  );
+
+  if (!data) {
+    utilization.value = null;
+    return;
   }
+  const result = data || [];
+  const mapped: UtilizationRange[] = result.map((u) => {
+    const range = u.from + ' - ' + u.to;
+    let nodes: string;
+    if (u.nodes > 80) {
+      nodes = '80+';
+    } else if (u.nodes > 40) {
+      nodes = '40+';
+    } else if (u.nodes > 20) {
+      nodes = '20+';
+    } else if (u.nodes > 10) {
+      nodes = '10+';
+    } else {
+      nodes = ''+u.nodes;
+    }
+    return {
+      from: u.from,
+      to: u.to,
+      tier: u.tier,
+      utilization: (u.utilization * 100).toFixed(2),
+      nodes,
+      range,
+    };
+  });
+  mapped.sort((e1, e2) => e1.from - e2.from)
+  utilization.value = mapped.filter((d) => Number(d.utilization) > 0);
+  selectedDays.value = days;
+}
+
+onMounted(() => {
+  getUtilization(7);
+});
 </script>
 
 <style>

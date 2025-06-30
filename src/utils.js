@@ -1,5 +1,7 @@
-module.exports = {
-  fromNow: (date) => {
+export const fromNow = (date) => {
+    if (typeof date === 'string') {
+      date = new Date(date);
+    }
     let minutes = (new Date().getTime() - date.getTime()) / 1000 / 60;
     if (minutes < 60) {
       return `${minutes.toFixed(0)} minutes`;
@@ -10,4 +12,3 @@ module.exports = {
       return `${hours.toFixed(0)} hours ${minutes.toFixed(0)} minutes`;
     }
   }
-}

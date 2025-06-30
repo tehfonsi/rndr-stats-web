@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nuxt />
+    <slot />
   </div>
 </template>
 
@@ -11,6 +11,7 @@
 
   a {
     color: #b41e2d;
+    text-decoration: underline;
   }
 
   .primary {
@@ -26,6 +27,7 @@
       'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 16px;
     word-spacing: 1px;
+    line-height: 1.2;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     -moz-osx-font-smoothing: grayscale;
@@ -35,9 +37,7 @@
     color: #f0f0f0;
   }
 
-  *,
-  *:before,
-  *:after {
+  body {
     box-sizing: border-box;
     margin: 0;
   }

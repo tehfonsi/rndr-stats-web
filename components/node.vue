@@ -40,91 +40,95 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { fromNow } from '../src/utils';
 
-export default {
-  props: {
-    node: Object,
-  },
-  data: () => {
-    return {
-      state: { expanded: true },
-      edit: false,
-    };
-  },
-  mounted() {
-    const savedState = window.localStorage.getItem(this.node.id);
-    if (savedState) {
-      this.state = JSON.parse(savedState);
-    }
-  },
-  methods: {
-    fromNow: function(date) {
-      return fromNow(new Date(date));
-    },
-    latestDate: function(node) {
-      if (node.updated && node.updated > node.since) {
-        return node.updated;
-      }
-      return node.since;
-    },
-    showWarning: function(date) {
-      const hour = 1000 * 60 * 60;
-      const anHourAgo = Date.now() - hour;
+interface NodeJobs {
+  job_count: number;
+  utilization: number;
+  income: number;
+}
 
-      return new Date(date) < anHourAgo;
-    },
-    toggle: function() {
-      this.state.expanded = !this.state.expanded;
-      this.saveState();
-    },
-    saveState: function() {
-      window.localStorage.setItem(this.node.id, JSON.stringify(this.state));
-    },
-    showInput: function() {
-      this.edit = true;
-      this.$nextTick(() => {
-        const input = this.$el.querySelector('input');
-        input.focus();
-      });
-    },
-    hideInput: function() {
-      this.edit = false;
-    },
-    changeName: async function() {
-      const password = prompt('Enter your password', '');
-      const input = this.$el.querySelector('input');
-      const name = input.value;
-      this.hideInput();
-      const result = await this.$axios
-        .$post('/api/node-name', {
-          node_id: this.node.id,
-          name,
-          password,
-        })
-        .catch((error) => {
-          if (error.response.status === 403) {
-            alert(
-              'Wrong password! Make sure you set the same password in the .ini file of all nodes.'
-            );
-          }
-        });
-      if (result !== undefined) {
-        this.node.name = name;
-      }
-    },
-  },
-  computed: {
-    jobs: function() {
-      return this.node.jobs;
-    },
-    expanded: function() {
-      return this.state.expanded;
-    },
-    showObWarning: function() {
-      return this.node.score > 300 && this.node.score < 400;
-    },
-  },
-};
+interface Node {
+  id: string;
+  name?: string;
+  gpus: string;
+  score: number;
+  state: string;
+  since: string | number | Date;
+  updated?: string | number | Date;
+  jobs_completed: number;
+  previews_sent: number;
+  thumbnails_sent: number;
+  jobs?: NodeJobs;
+}
+
+const props = defineProps<{ node: Node }>();
+
+const state = reactive({ expanded: true });
+const edit = ref(false);
+
+onMounted(() => {
+  const savedState = window.localStorage.getItem(props.node.id);
+  if (savedState) {
+    Object.assign(state, JSON.parse(savedState));
+  }
+});
+
+function latestDate(node: Node) {
+  if (node.updated && node.updated > node.since) {
+    return node.updated;
+  }
+  return node.since;
+}
+
+function showWarning(date: string | number | Date) {
+  const hour = 1000 * 60 * 60;
+  const anHourAgo = Date.now() - hour;
+  return new Date(date).getTime() < anHourAgo;
+}
+
+function toggle() {
+  state.expanded = !state.expanded;
+  saveState();
+}
+
+function saveState() {
+  window.localStorage.setItem(props.node.id, JSON.stringify(state));
+}
+
+function showInput() {
+  edit.value = true;
+  nextTick(() => {
+    const input = (document.querySelector('input') as HTMLInputElement | null);
+    if (input) input.focus();
+  });
+}
+
+function hideInput() {
+  edit.value = false;
+}
+
+async function changeName() {
+  const password = prompt('Enter your password', '');
+  const input = (document.querySelector('input') as HTMLInputElement | null);
+  const name = input?.value || '';
+  hideInput();
+  try {
+    await $fetch('/api/node-name', {
+      method: 'POST',
+      body: { node_id: props.node.id, name, password },
+    });
+
+    props.node.name = name;
+  } catch (error: any) {
+    alert(
+      `Error: ${error?.response?.status || ''} ${error?.response?.statusText || ''}\nWrong password! Make sure you set the same password in the .ini file of all nodes.`
+    );
+  }
+}
+
+const jobs = computed(() => props.node.jobs);
+const expanded = computed(() => state.expanded);
+const showObWarning = computed(() => props.node.score > 300 && props.node.score < 400);
 </script>

@@ -1,16 +1,12 @@
 import { createConnection } from 'promise-mysql';
 import sha256 from 'js-sha256';
 
-const SETUP_CONNECTION_PARAMS_OLD = {
-  host: 'rndr-stats.cfmuykp6mt1h.eu-central-1.rds.amazonaws.com',
-  user: 'admin',
-  password: process.env.DB_PASSWORD
-};
+const config = useRuntimeConfig();
 
 const SETUP_CONNECTION_PARAMS = {
   host: '5.75.158.56',
   user: 'rndrstats',
-  password: process.env.DB_PASSWORD
+  password: config.DB_PASSWORD
 };
 
 const CONNECTION_PARAMS = {
