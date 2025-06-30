@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "rndr-stats.com",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,14 +7,14 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "node .output/server/index.mjs"
   },
   "dependencies": {
     "@nuxtjs/tailwindcss": "7.0.0-beta.0",
     "nuxt": "3.17.5",
     "vue": "3.5.17",
     "vue-router": "4.5.1",
-    "cross-env": "5.2.0",
     "js-sha256": "0.9.0",
     "node-fetch": "2.6.6",
     "promise-mysql": "5.0.4"

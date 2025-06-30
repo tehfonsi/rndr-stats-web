@@ -6,7 +6,7 @@ const config = useRuntimeConfig();
 const SETUP_CONNECTION_PARAMS = {
   host: '5.75.158.56',
   user: 'rndrstats',
-  password: config.DB_PASSWORD
+  password: config.dbPassword
 };
 
 const CONNECTION_PARAMS = {

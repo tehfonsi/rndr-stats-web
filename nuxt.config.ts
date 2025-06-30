@@ -4,6 +4,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
-    DB_PASSWORD: process.env.DB_PASSWORD
+    dbPassword: process.env.NUXT_DB_PASSWORD
   }
 })
