@@ -82,7 +82,8 @@ function latestDate(node: Node) {
   return node.since;
 }
 
-function showWarning(date: string | number | Date) {
+function showWarning(date: string | number | Date | undefined) {
+  if (!date) return false;
   const hour = 1000 * 60 * 60;
   const anHourAgo = Date.now() - hour;
   return new Date(date).getTime() < anHourAgo;
