@@ -1,4 +1,4 @@
-import { createConnection, createPool, Pool } from 'promise-mysql';
+import { createConnection, createPool } from 'promise-mysql';
 import sha256 from 'js-sha256';
 
 const config = useRuntimeConfig();
