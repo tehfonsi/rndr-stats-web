@@ -5,7 +5,7 @@
       <Script
         async
         src="https://umami.tehfonsi.com/script.js"
-        data-website-id="9f317854-b13f-41fb-a0e4-7f81d0fb86ab"
+        data-website-id="92aee151-ad83-4462-be65-9007cd7040d5"
       ></Script>
     </Head>
     <Body>
