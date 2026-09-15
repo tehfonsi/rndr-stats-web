@@ -26,7 +26,7 @@ export const setup = async () => {
 
   await con.query('CREATE DATABASE IF NOT EXISTS rndrstats;');
   await con.query('USE rndrstats;');
-  await con.query('create table if not exists `operators` (`id` int unsigned not null auto_increment primary key,`eth_address` VARCHAR(255) not null,`created` DATETIME null default CURRENT_TIMESTAMP)');
+  await con.query('create table if not exists `operators` (`id` int unsigned not null auto_increment primary key,`eth_address` VARCHAR(255) null,`sol_address` VARCHAR(255) null,`created` DATETIME null default CURRENT_TIMESTAMP, index `idx_operators_sol_address` (`sol_address`))');
 
   await con.end();
 }
@@ -34,9 +34,40 @@ export const setup = async () => {
 export const setOperator = async (operator) => {
   const con = await POOL.getConnection();
   try {
-    const result = await con.query(`REPLACE into operators (id, eth_address) 
-                    values(${operator.id}, '${operator.eth_address}')`);
+    // never wipe a known address with null, keep `created`
+    const result = await con.query(`insert into operators (id, eth_address, sol_address)
+                    values(?, ?, ?)
+                    on duplicate key update
+                    eth_address=COALESCE(VALUES(eth_address), eth_address),
+                    sol_address=COALESCE(VALUES(sol_address), sol_address)`,
+      [operator.id, operator.eth_address || null, operator.sol_address || null]);
     return result;
+  } finally {
+    con.release();
+  }
+}
+
+export const findOperatorBySol = async (sol_address) => {
+  const con = await POOL.getConnection();
+  try {
+    // prefer the ETH-based operator if both exist
+    const rows = await con.query(`select id, eth_address, sol_address from operators
+                    where sol_address = ?
+                    order by eth_address is null
+                    limit 1`, [sol_address]);
+    return rows.length > 0 ? rows[0] : null;
+  } finally {
+    con.release();
+  }
+}
+
+// Move everything owned by operator `fromId` to `toId` and delete `fromId`
+export const mergeOperator = async (fromId, toId) => {
+  const con = await POOL.getConnection();
+  try {
+    await con.query('update nodes set operator = ? where operator = ?', [toId, fromId]);
+    await con.query('update package set operator = ? where operator = ?', [toId, fromId]);
+    await con.query('delete from operators where id = ?', [fromId]);
   } finally {
     con.release();
   }

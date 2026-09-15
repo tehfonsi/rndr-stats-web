@@ -66,8 +66,8 @@
         </ul>
         <br />
         <span
-          ><i>Warning</i>: Your ETH address is sent and needed to identify your
-          nodes</span
+          ><i>Warning</i>: Your ETH address (or Solana wallet, if you have no
+          ETH address) is sent and needed to identify your nodes</span
         >
       </div>
     </div>

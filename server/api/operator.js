@@ -1,5 +1,4 @@
-import hash from '../utils/hash';
-import { setOperator } from '../utils/database';
+import { resolveOperator } from '../utils/operator';
 import { defineEventHandler, readBody, sendError, createError } from 'h3';
 
 export default defineEventHandler(async (event) => {
@@ -7,18 +6,13 @@ export default defineEventHandler(async (event) => {
     return sendError(event, createError({ statusCode: 405, statusMessage: 'Method Not Allowed' }));
   }
   const body = await readBody(event);
-  const { eth_address } = body;
-  const id = hash(eth_address);
-
-  const operator = {
-    id,
-    eth_address
-  };
-
 
   try {
-    await setOperator(operator);
-    return id;
+    const operator = await resolveOperator(body);
+    if (!operator) {
+      return sendError(event, createError({ statusCode: 400, statusMessage: 'eth_address or sol_address required' }));
+    }
+    return operator.id;
   } catch (error) {
     console.error(error);
     return sendError(event, createError({ statusCode: 500, statusMessage: error.message }));
