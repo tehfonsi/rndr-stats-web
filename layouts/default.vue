@@ -18,6 +18,17 @@
 </template>
 
 <style>
+:root {
+  --rs-bg: #151617;
+  --rs-card: #1b1d1f;
+  --rs-border: rgba(255, 255, 255, 0.08);
+  --rs-secondary: #c3c4c7;
+  --rs-muted: #8b8e94;
+  --rs-grid: #26282b;
+  --rs-axis: #3a3d41;
+  --rs-chart: #e5484d;
+}
+
 .highlight {
   background: #b41e2d;
 }

@@ -26,7 +26,7 @@ export const setup = async () => {
 
   await con.query('CREATE DATABASE IF NOT EXISTS rndrstats;');
   await con.query('USE rndrstats;');
-  await con.query('create table if not exists `operators` (`id` int unsigned not null auto_increment primary key,`eth_address` VARCHAR(255) null,`sol_address` VARCHAR(255) null,`created` DATETIME null default CURRENT_TIMESTAMP, index `idx_operators_sol_address` (`sol_address`))');
+  await con.query('create table if not exists `operators` (`id` int unsigned not null auto_increment primary key,`eth_address` VARCHAR(255) null,`sol_address` VARCHAR(255) null,`reward_wallet` VARCHAR(64) null,`created` DATETIME null default CURRENT_TIMESTAMP, index `idx_operators_sol_address` (`sol_address`))');
 
   await con.end();
 }
@@ -119,12 +119,22 @@ export const addJob = async (job) => {
 export const getNodeOverview = async (operator_id) => {
   const con = await POOL.getConnection();
   try {
-    const result = await con.query(`SELECT n.id, n.name, n.updated, n.gpus, n.score, n.jobs_completed, n.previews_sent, n.thumbnails_sent, s.type as state, s.created as since
-    FROM states s
-      INNER JOIN nodes n ON s.node = n.id
-    WHERE s.id IN (SELECT MAX(id) FROM states GROUP BY node) 
-    AND s.node IN (SELECT id FROM nodes WHERE operator = ${operator_id})`);
-    return result;
+    const nodes = await con.query(`SELECT id, name, updated, gpus, score, jobs_completed, previews_sent, thumbnails_sent
+      FROM nodes WHERE operator = ?`, [operator_id]);
+    if (!nodes.length) return [];
+
+    // Latest state per node in a second query: with a literal id list MySQL reads one index entry
+    // per node ("Using index for group-by"), 0.05s instead of 2-7s for nodes with 250k+ state rows.
+    const states = await con.query(`SELECT s.node, s.type, s.created
+      FROM states s
+        INNER JOIN (SELECT node, MAX(id) AS id FROM states WHERE node IN (?) GROUP BY node) latest ON latest.id = s.id`,
+      [nodes.map((n) => n.id)]);
+    const byNode = new Map(states.map((s) => [s.node, s]));
+
+    // nodes without any state are left out, like the former inner join did
+    return nodes
+      .filter((n) => byNode.has(n.id))
+      .map((n) => ({ ...n, state: byNode.get(n.id).type, since: byNode.get(n.id).created }));
   } finally {
     con.release();
   }
@@ -163,13 +173,43 @@ export const getJobOverview = async (operator_id, start, end) => {
   }
 }
 
+// busy seconds and job count per node, grouped into time buckets of `bucket` seconds
+export const getJobHistory = async (operator_id, start, end, bucket) => {
+  const con = await POOL.getConnection();
+  try {
+    const result = await con.query(`select j.node, floor(unix_timestamp(j.start) / ?) * ? as bucket,
+        sum(j.time) as busy, count(*) as job_count
+      from jobs j
+        inner join nodes n ON j.node = n.id
+      where j.start >= from_unixtime(?) and j.end <= from_unixtime(?)
+      and n.operator = ?
+      group by j.node, bucket
+      order by bucket`, [bucket, bucket, start, end, operator_id]);
+    return result;
+  } finally {
+    con.release();
+  }
+}
+
 export const getPasswords = async (node_id) => {
   const con = await POOL.getConnection();
   try {
     const result = await con.query(`select password from nodes
-      where operator = (select operator from nodes where id = '${node_id}')
-      and updated > DATE_SUB(NOW(), INTERVAL 1 MONTH)`);
+      where operator = (select operator from nodes where id = ?)
+      and updated > DATE_SUB(NOW(), INTERVAL 1 MONTH)`, [node_id]);
     return result;
+  } finally {
+    con.release();
+  }
+}
+
+// password hashes of an operator's nodes that reported in the last month
+export const getOperatorPasswords = async (operator_id) => {
+  const con = await POOL.getConnection();
+  try {
+    return await con.query(`select password from nodes
+      where operator = ?
+      and updated > DATE_SUB(NOW(), INTERVAL 1 MONTH)`, [operator_id]);
   } finally {
     con.release();
   }
@@ -178,10 +218,29 @@ export const getPasswords = async (node_id) => {
 export const updateName = async (node_id, name) => {
   const con = await POOL.getConnection();
   try {
-    const result = await con.query(`update nodes
-      set name = '${name}'
-      where id = '${node_id}'`);
+    const result = await con.query('update nodes set name = ? where id = ?', [name, node_id]);
     return result;
+  } finally {
+    con.release();
+  }
+}
+
+// Solana wallet that receives the operator's Render rewards, set on the dashboard.
+// Not operators.sol_address: that is the obfuscated registry value used to identify the operator.
+export const getRewardWallet = async (operator_id) => {
+  const con = await POOL.getConnection();
+  try {
+    const rows = await con.query('select reward_wallet from operators where id = ?', [operator_id]);
+    return rows.length ? rows[0].reward_wallet : null;
+  } finally {
+    con.release();
+  }
+}
+
+export const setRewardWallet = async (operator_id, wallet) => {
+  const con = await POOL.getConnection();
+  try {
+    return await con.query('update operators set reward_wallet = ? where id = ?', [wallet, operator_id]);
   } finally {
     con.release();
   }
