@@ -155,7 +155,7 @@ const nodeOverview = ref<NodeType[]>([]);
 const jobOverview = ref<Record<number, NodeJobs[]>>({});
 const jobHistory = ref<Record<number, JobHistory>>({});
 const loading = ref(true);
-const { order: sectionOrder } = useSectionOrder(['income', 'activity', 'nodes']);
+const { order: sectionOrder } = useSectionOrder(['income', 'nodes', 'activity']);
 const refreshing = ref(false);
 
 function nodeSort(n1: NodeType, n2: NodeType): number {
